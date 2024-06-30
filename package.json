@@ -1,0 +1,53 @@
+{
+  "name": "wallet-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "db:pull": "kysely-codegen",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.6.0",
+    "@nextui-org/react": "^2.4.1",
+    "@tanstack/react-query": "^5.49.2",
+    "@tanstack/react-query-devtools": "^5.49.2",
+    "axios": "^1.7.2",
+    "bcrypt": "^5.1.1",
+    "clsx": "^2.1.1",
+    "dayjs": "^1.11.11",
+    "framer-motion": "^11.2.10",
+    "jose": "^5.6.2",
+    "js-cookie": "^3.0.5",
+    "kysely": "^0.27.3",
+    "next": "14.2.3",
+    "numeral": "^2.0.6",
+    "pg": "^8.11.5",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.51.5",
+    "react-icons": "^5.2.1",
+    "uuid": "^9.0.1",
+    "zod": "^3.23.8",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/js-cookie": "^3.0.6",
+    "@types/node": "^20",
+    "@types/numeral": "^2.0.5",
+    "@types/pg": "^8.11.6",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/uuid": "^9.0.8",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.3",
+    "kysely-codegen": "^0.15.0",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
