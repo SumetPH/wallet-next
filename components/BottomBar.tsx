@@ -7,6 +7,7 @@ import {
   MdOutlineAccountBalance,
   MdOutlineLogout,
   MdOutlinePieChartOutline,
+  MdOutlineCategory,
 } from "react-icons/md";
 import jsCookie from "js-cookie";
 import clsx from "clsx";
@@ -31,7 +32,7 @@ export default function BottomBar() {
   return (
     <div className="fixed bottom-0 inset-x-0 lg:hidden p-3 z-10">
       <div className="bg-slate-500 rounded-xl h-full">
-        <div className="grid grid-cols-4 h-10">
+        <div className="grid grid-cols-5 h-10">
           <button
             className="flex justify-center items-center"
             onClick={() => router.push("/transaction")}
@@ -47,6 +48,15 @@ export default function BottomBar() {
           >
             <MdOutlineAccountBalance
               className={clsx(activeMenu("/account"))}
+              size={24}
+            />
+          </button>
+          <button
+            className="flex justify-center items-center"
+            onClick={() => router.push("/category")}
+          >
+            <MdOutlineCategory
+              className={clsx(activeMenu("/category"))}
               size={24}
             />
           </button>

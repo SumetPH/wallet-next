@@ -62,23 +62,21 @@ export async function GET(req: NextRequest) {
 
     const budgetList = await db
       .selectFrom("wallet_budget")
-      .leftJoin(
-        "transactions",
-        "transactions.category_id",
-        "wallet_budget.category_id"
+      .leftJoin("transactions", (join) =>
+        join
+          .onRef("transactions.category_id", "=", "wallet_budget.category_id")
+          .on(
+            "transactions.transaction_created_at",
+            ">=",
+            dayjs().startOf("month").hour(0).minute(0).second(0).toDate()
+          )
+          .on(
+            "transactions.transaction_created_at",
+            "<=",
+            dayjs().endOf("month").hour(23).minute(59).second(59).toDate()
+          )
       )
-      .where("transactions.user_id", "=", userId)
-      .where("transactions.category_type_id", "=", "1")
-      .where(
-        "transaction_created_at",
-        ">=",
-        dayjs().startOf("month").hour(0).minute(0).second(0).toDate()
-      )
-      .where(
-        "transaction_created_at",
-        "<=",
-        dayjs().endOf("month").hour(23).minute(59).second(59).toDate()
-      )
+      .where("wallet_budget.user_id", "=", userId)
       .groupBy("wallet_budget.budget_id")
       .orderBy("wallet_budget.budget_name")
       .select(({ fn }) => [

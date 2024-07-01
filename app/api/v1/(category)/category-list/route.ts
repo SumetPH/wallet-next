@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
         "wallet_category.category_updated_at",
         sql<string>`sum(coalesce(transaction_amount, 0))`.as("total"),
       ])
+      .orderBy("wallet_category.category_name")
       .execute();
 
     return Response.json(category);

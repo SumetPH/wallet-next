@@ -1,11 +1,9 @@
-import { Avatar, Skeleton } from "@nextui-org/react";
-import clsx from "clsx";
 import React from "react";
 import type { TransactionRes } from "@/services/transaction/useTransactionList";
-import dayjs from "dayjs";
 import TransactionHeader from "./TransactionHeader";
 import TransactionRow from "./TransactionRow";
 import numeral from "numeral";
+import SkeletonLoading from "../SkeletonLoading";
 
 type Props = {
   transactionRes?: TransactionRes[];
@@ -24,16 +22,10 @@ export default function TransactionList({
     <>
       <TransactionHeader onCreateOrUpdate={onCreateOrUpdate} />
 
-      {isLoading && (
-        <div className="my-6">
-          <Skeleton className="h-6 w-full rounded-lg my-4" />
-          <Skeleton className="h-36 w-full rounded-lg my-4" />
-        </div>
-      )}
-
-      {!isLoading && transactionRes.length === 0 && (
-        <div className="my-6 text-center">ไม่พบข้อมูล</div>
-      )}
+      <SkeletonLoading
+        isLoading={isLoading}
+        dataLength={transactionRes.length}
+      />
 
       {transactionRes.map((item) => (
         <div key={item.date}>

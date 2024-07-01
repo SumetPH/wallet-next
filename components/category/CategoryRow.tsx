@@ -1,4 +1,3 @@
-import { Account } from "@/services/account/useAccountList";
 import {
   Avatar,
   Dropdown,
@@ -8,35 +7,45 @@ import {
 } from "@nextui-org/react";
 import clsx from "clsx";
 import React, { useRef } from "react";
-import {
-  AccountDeleteModal,
-  AccountDeleteModalRef,
-} from "@/components/account/AccountDeleteModal";
 import { MdOutlineMoreVert } from "react-icons/md";
-import { AccountFormModalRef } from "@/components/account/AccountFormModal";
-import { AccountFormModal } from "@/components/account/AccountFormModal";
 import { useRouter } from "next/navigation";
 import numeral from "numeral";
 import { Category } from "@/services/category/useCategoryList";
+import { CategoryFormModal, CategoryFormModalRef } from "./CategoryFormModal";
+import {
+  CategoryDeleteModal,
+  CategoryDeleteModalRef,
+} from "./CategoryDeleteModal";
 
 type Props = {
   category: Category;
   amountColor?: string;
+  onUpdated?: () => void;
 };
 
-export default function CategoryRow({ category, amountColor }: Props) {
+export default function CategoryRow({
+  category,
+  amountColor,
+  onUpdated,
+}: Props) {
   const router = useRouter();
-  const AccountFormModalRef = useRef<AccountFormModalRef>(null);
-  const accountDeleteModalRef = useRef<AccountDeleteModalRef>(null);
+  const categoryFormModalRef = useRef<CategoryFormModalRef>(null);
+  const categoryDeleteModalRef = useRef<CategoryDeleteModalRef>(null);
 
   return (
     <>
-      {/* <AccountFormModal
-        ref={AccountFormModalRef}
-        account={account}
+      <CategoryFormModal
+        ref={categoryFormModalRef}
+        category={category}
         mode="edit"
+        onUpdated={onUpdated}
       />
-      <AccountDeleteModal ref={accountDeleteModalRef} account={account} /> */}
+
+      <CategoryDeleteModal
+        ref={categoryDeleteModalRef}
+        category={category}
+        onUpdated={onUpdated}
+      />
 
       <div
         key={category.category_id}
@@ -63,14 +72,14 @@ export default function CategoryRow({ category, amountColor }: Props) {
             <DropdownMenu>
               <DropdownItem
                 color="primary"
-                onPress={() => AccountFormModalRef.current?.openModal()}
+                onPress={() => categoryFormModalRef.current?.openModal()}
               >
                 แก้ไข
               </DropdownItem>
               <DropdownItem
                 className="text-danger"
                 color="danger"
-                onPress={() => accountDeleteModalRef.current?.openModal()}
+                onPress={() => categoryDeleteModalRef.current?.openModal()}
               >
                 ลบ
               </DropdownItem>

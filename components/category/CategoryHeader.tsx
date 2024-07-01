@@ -7,9 +7,11 @@ import {
   DropdownItem,
 } from "@nextui-org/react";
 import { CategoryFormModal, CategoryFormModalRef } from "./CategoryFormModal";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function CategoryHeader() {
   const categoryFormModalRef = useRef<CategoryFormModalRef>(null);
+  const queryClient = useQueryClient();
 
   return (
     <>
@@ -34,7 +36,12 @@ export default function CategoryHeader() {
         </section>
       </div>
 
-      <CategoryFormModal ref={categoryFormModalRef} />
+      <CategoryFormModal
+        ref={categoryFormModalRef}
+        onUpdated={() =>
+          queryClient.invalidateQueries({ queryKey: ["/category-list"] })
+        }
+      />
     </>
   );
 }

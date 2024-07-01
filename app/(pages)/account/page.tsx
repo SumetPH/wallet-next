@@ -7,6 +7,7 @@ import clsx from "clsx";
 import AccountRow from "@/components/account/AccountRow";
 import { Skeleton } from "@nextui-org/react";
 import numeral from "numeral";
+import SkeletonLoading from "@/components/SkeletonLoading";
 
 export default function AccountPage() {
   const accountList = useAccountList({
@@ -25,12 +26,10 @@ export default function AccountPage() {
     <>
       <AccountHeader />
 
-      {accountList.isLoading && (
-        <div className="my-6">
-          <Skeleton className="h-6 w-full rounded-lg my-4" />
-          <Skeleton className="h-36 w-full rounded-lg my-4" />
-        </div>
-      )}
+      <SkeletonLoading
+        isLoading={accountList.isLoading}
+        dataLength={accountList.data?.length}
+      />
 
       {accountList.data?.map((item) => (
         <div key={item.account_type_id}>

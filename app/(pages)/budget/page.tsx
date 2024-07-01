@@ -22,7 +22,12 @@ export default function BudgetPage() {
   const budgetList = useBudgetList({ enable: true });
 
   const budgetPercent = (budgetAmount: string, expense: string) => {
-    return Number(((Number(expense) * 100) / Number(budgetAmount)).toFixed(2));
+    const budgetAmountNum = Number(budgetAmount);
+    const expenseNum = Number(expense);
+
+    if (budgetAmountNum === 0 || expenseNum === 0) return 0;
+
+    return Number(((expenseNum * 100) / budgetAmountNum).toFixed(2));
   };
   return (
     <>

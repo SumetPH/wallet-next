@@ -28,7 +28,7 @@ const schema = z.object({
   categoryTypeId: z
     .set(z.string())
     .min(1, { message: "กรุณาเลือกประเภทหมวดหมู่" }),
-  startDate: z.string().datetime(),
+  categoryCreatedAt: z.string().datetime(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -36,6 +36,7 @@ type FormData = z.infer<typeof schema>;
 type Props = {
   category?: Category;
   mode?: "create" | "edit";
+  onUpdated?: () => void;
 };
 
 export type CategoryFormModalRef = {
@@ -43,7 +44,7 @@ export type CategoryFormModalRef = {
 };
 
 export const CategoryFormModal = forwardRef<CategoryFormModalRef, Props>(
-  ({ category, mode = "create" }, ref) => {
+  ({ category, mode = "create", onUpdated }, ref) => {
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
     const openModal = () => {
@@ -52,7 +53,7 @@ export const CategoryFormModal = forwardRef<CategoryFormModalRef, Props>(
         categoryTypeId: category?.category_type_id
           ? new Set([category?.category_type_id])
           : new Set([]),
-        startDate: category?.category_created_at
+        categoryCreatedAt: category?.category_created_at
           ? new Date(category?.category_created_at).toISOString()
           : new Date().toISOString(),
       });
@@ -74,56 +75,56 @@ export const CategoryFormModal = forwardRef<CategoryFormModalRef, Props>(
 
     const submit = (data: FormData) => {
       if (mode === "create") {
-        // createAccount(data);
+        createCategory(data);
       } else {
-        // updateAccount(data);
+        updateCategory(data);
       }
     };
 
-    // const createAccount = async (data: FormData) => {
-    //   try {
-    //     const res = await axiosWithToken({
-    //       url: "/account-create",
-    //       method: "POST",
-    //       data: {
-    //         account_name: data.accountName,
-    //         account_type_id: [...data.accountTypeId][0],
-    //         account_balance: data.balance,
-    //         account_start_date: dayjs(data.startDate).format(
-    //           "YYYY-MM-DD HH:mm:ss"
-    //         ),
-    //       },
-    //     });
-    //     if (res.status === 200) {
-    //       onOpenChange();
-    //     }
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // };
+    const createCategory = async (data: FormData) => {
+      try {
+        const res = await axiosWithToken({
+          url: "/category-create",
+          method: "POST",
+          data: {
+            category_name: data.categoryName,
+            category_type_id: [...data.categoryTypeId][0],
+            category_created_at: dayjs(data.categoryCreatedAt).format(
+              "YYYY-MM-DD HH:mm:ss"
+            ),
+          },
+        });
+        if (res.status === 200) {
+          onOpenChange();
+          if (onUpdated) onUpdated();
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-    // const updateAccount = async (data: FormData) => {
-    //   try {
-    //     const res = await axiosWithToken({
-    //       url: "/account-update",
-    //       method: "PUT",
-    //       data: {
-    //         account_id: account?.account_id,
-    //         account_name: data.accountName,
-    //         account_type_id: [...data.accountTypeId][0],
-    //         account_balance: data.balance,
-    //         account_start_date: dayjs(data.startDate).format(
-    //           "YYYY-MM-DD HH:mm:ss"
-    //         ),
-    //       },
-    //     });
-    //     if (res.status === 200) {
-    //       onOpenChange();
-    //     }
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // };
+    const updateCategory = async (data: FormData) => {
+      try {
+        const res = await axiosWithToken({
+          url: "/category-update",
+          method: "PUT",
+          data: {
+            category_id: category?.category_id,
+            category_name: data.categoryName,
+            category_type_id: [...data.categoryTypeId][0],
+            category_created_at: dayjs(data.categoryCreatedAt).format(
+              "YYYY-MM-DD HH:mm:ss"
+            ),
+          },
+        });
+        if (res.status === 200) {
+          onOpenChange();
+          if (onUpdated) onUpdated();
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
     return (
       <>
@@ -181,7 +182,7 @@ export const CategoryFormModal = forwardRef<CategoryFormModalRef, Props>(
 
                   <Controller
                     control={form.control}
-                    name="startDate"
+                    name="categoryCreatedAt"
                     render={({ field, formState }) => (
                       <I18nProvider locale="en-UK">
                         <DatePicker
