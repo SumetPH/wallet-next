@@ -5,8 +5,8 @@ import CategoryRow from "@/components/category/CategoryRow";
 import useCategoryList, {
   CategoryType,
 } from "@/services/category/useCategoryList";
-import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
-import React, { Key, useState } from "react";
+import { Tabs, Tab } from "@nextui-org/react";
+import React, { useState } from "react";
 
 export default function CategoryPage() {
   const [tab, setTab] = useState<any>("expense");

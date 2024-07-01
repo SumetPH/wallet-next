@@ -47,10 +47,3 @@ export async function GET(req: NextRequest) {
     return Response.json(error, { status: 500 });
   }
 }
-
-// category_type_id: string;
-// user_id: string | null;
-// category_created_at: Date;
-// category_id: string;
-// category_name: string;
-// category_updated_at: Date;

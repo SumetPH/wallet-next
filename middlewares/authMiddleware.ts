@@ -14,7 +14,10 @@ export default async function AuthMiddleware(req: NextRequest) {
       new TextEncoder().encode(secret)
     );
 
-    return { status: true, message: "valid token" };
+    const res = NextResponse.next();
+    res.cookies.set("user_id", data.payload.user_id);
+
+    return { status: true, res };
   } catch (error) {
     return { status: false, message: "invalid token" };
   }

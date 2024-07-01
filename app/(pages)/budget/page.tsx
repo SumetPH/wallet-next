@@ -16,7 +16,7 @@ export default function BudgetPage() {
     const lastDateInMonth = dayjs().endOf("month").format("DD");
     const currentDate = dayjs().format("DD");
     const remainingDays = Number(lastDateInMonth) - Number(currentDate);
-    return remainingDays;
+    return remainingDays + 1;
   }, []);
 
   const budgetList = useBudgetList({ enable: true });

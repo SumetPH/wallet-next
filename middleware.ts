@@ -19,11 +19,14 @@ export async function middleware(req: NextRequest) {
       "/api/v1/transaction-create",
       "/api/v1/transaction-update",
       "/api/v1/transaction-delete",
-      "/api/v1/category-list",
       "/api/v1/budget-list",
       "/api/v1/budget-create",
       "/api/v1/budget-update",
       "/api/v1/budget-delete",
+      "/api/v1/category-list",
+      "/api/v1/category-create",
+      "/api/v1/category-update",
+      "/api/v1/category-delete",
     ];
 
     if (routes.includes(req.nextUrl.pathname)) {
@@ -31,6 +34,8 @@ export async function middleware(req: NextRequest) {
       if (!auth.status) {
         return Response.json(auth, { status: 401 });
       }
+
+      return auth.res;
     }
   } else {
     // front-end middleware
