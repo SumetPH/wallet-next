@@ -1,6 +1,6 @@
 import { type NextRequest } from "next/server";
 import { z } from "zod";
-import db from "@/configs/db";
+import db from "@/lib/db";
 import dayjs from "dayjs";
 
 export const dynamic = "force-dynamic";

@@ -31,8 +31,7 @@ export default function AccountTransaction({
     <TransactionList
       transactionRes={transactionList.data}
       isLoading={transactionList.isLoading}
-      onCreateOrUpdate={() => transactionList.refetch()}
-      onDelete={() => transactionList.refetch()}
+      onSuccess={() => {}}
     />
   );
 }

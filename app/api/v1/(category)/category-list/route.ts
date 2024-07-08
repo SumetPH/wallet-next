@@ -1,4 +1,5 @@
-import db from "@/configs/db";
+import { getSession } from "@/lib/auth";
+import db from "@/lib/db";
 import { sql } from "kysely";
 import { NextRequest } from "next/server";
 import { z } from "zod";
@@ -7,8 +8,10 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = req.cookies.get("user_id")?.value;
-    if (!userId) return Response.json("user_id not found", { status: 404 });
+    const session = await getSession();
+    if (!session) {
+      return Response.json({ message: "unauthorized" }, { status: 401 });
+    }
 
     const schema = z.object({
       category_type_id: z.string().min(1),
@@ -22,7 +25,7 @@ export async function GET(req: NextRequest) {
 
     const category = await db
       .selectFrom("wallet_category")
-      .where("wallet_category.user_id", "=", userId)
+      .where("wallet_category.user_id", "=", session.user.id)
       .where("wallet_category.category_type_id", "=", query.category_type_id)
       .leftJoin(
         "transactions",

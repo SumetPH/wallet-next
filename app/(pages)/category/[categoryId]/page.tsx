@@ -17,8 +17,7 @@ export default function CategoryTransaction({
     <TransactionList
       transactionRes={transactionList.data}
       isLoading={transactionList.isLoading}
-      onCreateOrUpdate={() => transactionList.refetch()}
-      onDelete={() => transactionList.refetch()}
+      onSuccess={() => {}}
     />
   );
 }

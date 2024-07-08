@@ -1,7 +1,6 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { axiosWithToken } from "../axiosWithToken";
 
 export interface TransactionRes {
   date: string;
@@ -46,11 +45,11 @@ export default function useTransactionList({
 
   const transactionList = useQuery({
     queryKey: ["/transaction-list", query],
-    queryFn: () =>
-      axiosWithToken<TransactionRes[]>({
-        url: `/transaction-list${query}`,
-        method: "GET",
-      }).then((res) => res.data),
+    queryFn: async () => {
+      const res = await fetch(`/api/v1/transaction-list${query}`);
+      const json: TransactionRes[] = await res.json();
+      return json;
+    },
   });
 
   return transactionList;

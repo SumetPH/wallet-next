@@ -1,9 +1,8 @@
-import db from "@/configs/db";
-import { NextRequest } from "next/server";
+import db from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const accountTypes = await db
       .selectFrom("wallet_account_type")

@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import db from "@/configs/db";
+import db from "@/lib/db";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";

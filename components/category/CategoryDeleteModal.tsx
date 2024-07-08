@@ -1,4 +1,3 @@
-import { axiosWithToken } from "@/services/axiosWithToken";
 import {
   Button,
   Modal,
@@ -34,13 +33,13 @@ export const CategoryDeleteModal = forwardRef<CategoryDeleteModalRef, Props>(
 
     const deleteCategory = async () => {
       try {
-        await axiosWithToken({
-          url: "/category-delete",
-          method: "DELETE",
-          data: {
-            category_id: category.category_id,
-          },
-        });
+        // await axiosWithToken({
+        //   url: "/category-delete",
+        //   method: "DELETE",
+        //   data: {
+        //     category_id: category.category_id,
+        //   },
+        // });
       } catch (error) {
         console.error(error);
       } finally {

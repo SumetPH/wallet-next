@@ -1,0 +1,63 @@
+import { Google } from "arctic";
+import { Lucia, TimeSpan } from "lucia";
+import { NodePostgresAdapter } from "@lucia-auth/adapter-postgresql";
+import { Pool } from "pg";
+import { cookies } from "next/headers";
+
+declare module "lucia" {
+  interface Register {
+    Lucia: typeof lucia;
+    DatabaseUserAttributes: DatabaseUserAttributes;
+  }
+}
+
+interface DatabaseUserAttributes {
+  id: string;
+  user_name: string;
+  user_created_at: string;
+  user_updated_at: string;
+  user_password: string | null;
+  user_provider: string;
+  user_email: string;
+}
+
+export const adapter = new NodePostgresAdapter(
+  new Pool({
+    connectionString: process.env.DATABASE_URL,
+  }),
+  {
+    user: "wallet_user",
+    session: "user_session",
+  }
+);
+
+export const lucia = new Lucia(adapter, {
+  sessionExpiresIn: new TimeSpan(30, "d"),
+  sessionCookie: {
+    expires: false,
+    attributes: {
+      secure: process.env.NODE_ENV === "production",
+    },
+  },
+  getUserAttributes: (attributes) => {
+    return {
+      name: attributes.user_name,
+      email: attributes.user_email,
+      provider: attributes.user_provider,
+    };
+  },
+});
+
+export const googleAuth = new Google(
+  process.env.AUTH_GOOGLE_ID!,
+  process.env.AUTH_GOOGLE_SECRET!,
+  "http://localhost:3010/api/auth/google/callback"
+);
+
+export async function getSession() {
+  const sessionId = cookies().get(lucia.sessionCookieName)?.value;
+  if (!sessionId) return undefined;
+  const result = await lucia.validateSession(sessionId);
+  if (!result.session) return undefined;
+  return result;
+}

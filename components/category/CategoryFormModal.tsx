@@ -1,7 +1,6 @@
 "use client";
 
 import React, { forwardRef, useImperativeHandle } from "react";
-import dayjs from "dayjs";
 import {
   Modal,
   ModalContent,
@@ -20,7 +19,6 @@ import { parseAbsoluteToLocal } from "@internationalized/date";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { axiosWithToken } from "@/services/axiosWithToken";
 import { Category } from "@/services/category/useCategoryList";
 
 const schema = z.object({
@@ -44,8 +42,8 @@ export type CategoryFormModalRef = {
 };
 
 export const CategoryFormModal = forwardRef<CategoryFormModalRef, Props>(
-  ({ category, mode = "create", onUpdated }, ref) => {
-    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  ({ category, mode = "create" }, ref) => {
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     const openModal = () => {
       form.reset({
@@ -73,54 +71,54 @@ export const CategoryFormModal = forwardRef<CategoryFormModalRef, Props>(
       { id: "2", name: "รายรับ" },
     ];
 
-    const submit = (data: FormData) => {
+    const submit = () => {
       if (mode === "create") {
-        createCategory(data);
+        createCategory();
       } else {
-        updateCategory(data);
+        updateCategory();
       }
     };
 
-    const createCategory = async (data: FormData) => {
+    const createCategory = async () => {
       try {
-        const res = await axiosWithToken({
-          url: "/category-create",
-          method: "POST",
-          data: {
-            category_name: data.categoryName,
-            category_type_id: [...data.categoryTypeId][0],
-            category_created_at: dayjs(data.categoryCreatedAt).format(
-              "YYYY-MM-DD HH:mm:ss"
-            ),
-          },
-        });
-        if (res.status === 200) {
-          onOpenChange();
-          if (onUpdated) onUpdated();
-        }
+        // const res = await axiosWithToken({
+        //   url: "/category-create",
+        //   method: "POST",
+        //   data: {
+        //     category_name: data.categoryName,
+        //     category_type_id: [...data.categoryTypeId][0],
+        //     category_created_at: dayjs(data.categoryCreatedAt).format(
+        //       "YYYY-MM-DD HH:mm:ss"
+        //     ),
+        //   },
+        // });
+        // if (res.status === 200) {
+        //   onOpenChange();
+        //   if (onUpdated) onUpdated();
+        // }
       } catch (error) {
         console.error(error);
       }
     };
 
-    const updateCategory = async (data: FormData) => {
+    const updateCategory = async () => {
       try {
-        const res = await axiosWithToken({
-          url: "/category-update",
-          method: "PUT",
-          data: {
-            category_id: category?.category_id,
-            category_name: data.categoryName,
-            category_type_id: [...data.categoryTypeId][0],
-            category_created_at: dayjs(data.categoryCreatedAt).format(
-              "YYYY-MM-DD HH:mm:ss"
-            ),
-          },
-        });
-        if (res.status === 200) {
-          onOpenChange();
-          if (onUpdated) onUpdated();
-        }
+        // const res = await axiosWithToken({
+        //   url: "/category-update",
+        //   method: "PUT",
+        //   data: {
+        //     category_id: category?.category_id,
+        //     category_name: data.categoryName,
+        //     category_type_id: [...data.categoryTypeId][0],
+        //     category_created_at: dayjs(data.categoryCreatedAt).format(
+        //       "YYYY-MM-DD HH:mm:ss"
+        //     ),
+        //   },
+        // });
+        // if (res.status === 200) {
+        //   onOpenChange();
+        //   if (onUpdated) onUpdated();
+        // }
       } catch (error) {
         console.error(error);
       }
@@ -155,7 +153,7 @@ export const CategoryFormModal = forwardRef<CategoryFormModalRef, Props>(
                   <Controller
                     control={form.control}
                     name="categoryTypeId"
-                    render={({ field, formState }) => (
+                    render={({ field }) => (
                       <Select
                         label="ชนิดหมวดหมู่"
                         placeholder="เลือก"
@@ -183,7 +181,7 @@ export const CategoryFormModal = forwardRef<CategoryFormModalRef, Props>(
                   <Controller
                     control={form.control}
                     name="categoryCreatedAt"
-                    render={({ field, formState }) => (
+                    render={({ field }) => (
                       <I18nProvider locale="en-UK">
                         <DatePicker
                           label="วันเริ่มต้น"

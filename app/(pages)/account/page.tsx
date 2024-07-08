@@ -5,7 +5,6 @@ import useAccountList from "@/services/account/useAccountList";
 import React from "react";
 import clsx from "clsx";
 import AccountRow from "@/components/account/AccountRow";
-import { Skeleton } from "@nextui-org/react";
 import numeral from "numeral";
 import SkeletonLoading from "@/components/SkeletonLoading";
 

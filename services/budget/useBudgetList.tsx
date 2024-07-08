@@ -1,7 +1,6 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { axiosWithToken } from "../axiosWithToken";
 
 export interface Budget {
   budget_total: string;
@@ -31,11 +30,11 @@ export default function useBudgetList({ enable = true }: Props) {
   const budgetList = useQuery({
     enabled: enable,
     queryKey: ["/budget-list"],
-    queryFn: () =>
-      axiosWithToken<BudgetRes>({
-        url: `/budget-list`,
-        method: "GET",
-      }).then((res) => res.data),
+    queryFn: async () => {
+      const res = await fetch(`/api/v1/budget-list`);
+      const json: BudgetRes = await res.json();
+      return json;
+    },
   });
 
   return budgetList;

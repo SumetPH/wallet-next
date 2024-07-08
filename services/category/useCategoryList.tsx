@@ -1,7 +1,6 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { axiosWithToken } from "../axiosWithToken";
 
 export type Category = {
   category_id: string;
@@ -34,11 +33,11 @@ export default function useCategoryList({
   const categoryList = useQuery({
     enabled: enable,
     queryKey: ["/category-list", query],
-    queryFn: () =>
-      axiosWithToken<Category[]>({
-        url: `/category-list${query}`,
-        method: "GET",
-      }).then((res) => res.data),
+    queryFn: async () => {
+      const res = await fetch(`/api/v1/category-list${query}`);
+      const json: Category[] = await res.json();
+      return json;
+    },
   });
 
   return categoryList;

@@ -1,14 +1,17 @@
 import { type NextRequest } from "next/server";
 import { z } from "zod";
 import { sql } from "kysely";
-import db from "@/configs/db";
+import db from "@/lib/db";
+import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = req.cookies.get("user_id")?.value;
-    if (!userId) return Response.json("user_id not found", { status: 404 });
+    const session = await getSession();
+    if (!session) {
+      return Response.json({ message: "unauthorized" }, { status: 401 });
+    }
 
     const schema = z.object({
       account_id: z.string().optional(),
@@ -27,7 +30,7 @@ export async function GET(req: NextRequest) {
 
     let querySql = db
       .selectFrom("transactions")
-      .where("transactions.user_id", "=", userId)
+      .where("transactions.user_id", "=", session.user.id)
       .select([
         sql<string>`to_char(date(transaction_created_at), 'YYYY-MM-DD')`.as(
           "date"
@@ -61,7 +64,6 @@ export async function GET(req: NextRequest) {
       ])
       .groupBy("date")
       .orderBy("date desc");
-
     if (query.account_id) {
       querySql = querySql.where("account_id", "=", query.account_id);
     }

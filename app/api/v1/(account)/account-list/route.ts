@@ -1,13 +1,15 @@
-import type { NextRequest } from "next/server";
 import { sql } from "kysely";
-import db from "@/configs/db";
+import db from "@/lib/db";
+import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const userId = req.cookies.get("user_id")?.value;
-    if (!userId) return Response.json("user_id not found", { status: 404 });
+    const session = await getSession();
+    if (!session) {
+      return Response.json({ message: "unauthorized" }, { status: 401 });
+    }
 
     const accounts = await db
       .selectFrom("wallet_account")
@@ -60,7 +62,7 @@ export async function GET(req: NextRequest) {
       )
       `.as("accounts"),
       ])
-      .where("user_id", "=", userId)
+      .where("user_id", "=", session.user.id)
       .execute();
 
     return Response.json(accounts);

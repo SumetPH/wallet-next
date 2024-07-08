@@ -1,14 +1,17 @@
-import db from "@/configs/db";
+import db from "@/lib/db";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import dayjs from "dayjs";
+import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function PUT(req: NextRequest) {
   try {
-    const userId = req.cookies.get("user_id")?.value;
-    if (!userId) return Response.json("user_id not found", { status: 404 });
+    const session = await getSession();
+    if (!session) {
+      return Response.json({ message: "unauthorized" }, { status: 401 });
+    }
 
     const schema = z.object({
       category_id: z.string().min(1),
@@ -22,7 +25,7 @@ export async function PUT(req: NextRequest) {
     const updateCategory = await db
       .updateTable("wallet_category")
       .where("category_id", "=", body.category_id)
-      .where("user_id", "=", userId)
+      .where("user_id", "=", session.user.id)
       .set({
         category_name: body.category_name,
         category_type_id: body.category_type_id,

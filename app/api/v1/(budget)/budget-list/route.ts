@@ -1,20 +1,22 @@
-import type { NextRequest } from "next/server";
 import { sql } from "kysely";
-import db from "@/configs/db";
+import db from "@/lib/db";
 import dayjs from "dayjs";
+import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const userId = req.cookies.get("user_id")?.value;
-    if (!userId) return Response.json("user_id not found", { status: 404 });
+    const session = await getSession();
+    if (!session) {
+      return Response.json({ message: "unauthorized" }, { status: 401 });
+    }
 
     const budget = await db
       .with("budget_all", (db) =>
         db
           .selectFrom("wallet_budget")
-          .where("wallet_budget.user_id", "=", userId)
+          .where("wallet_budget.user_id", "=", session.user.id)
           .groupBy(["wallet_budget.category_id", "wallet_budget.user_id"])
           .select(({ fn }) => [
             "wallet_budget.user_id",
@@ -26,7 +28,7 @@ export async function GET(req: NextRequest) {
         db
           .selectFrom("transactions")
           .where("transactions.category_type_id", "=", "1")
-          .where("transactions.user_id", "=", userId)
+          .where("transactions.user_id", "=", session.user.id)
           .where(
             "transaction_created_at",
             ">=",
@@ -51,7 +53,7 @@ export async function GET(req: NextRequest) {
         "budget_all.category_id"
       )
       .groupBy("budget_all.user_id")
-      .select(({ fn }) => [
+      .select(() => [
         sql<string>`sum(budget_all.budget_total)`.as("budget_total"),
         sql<string>`sum(budget_spend.budget_spend)`.as("budget_spend"),
         sql<string>`sum(budget_all.budget_total) - sum(budget_spend.budget_spend)`.as(
@@ -76,7 +78,7 @@ export async function GET(req: NextRequest) {
             dayjs().endOf("month").hour(23).minute(59).second(59).toDate()
           )
       )
-      .where("wallet_budget.user_id", "=", userId)
+      .where("wallet_budget.user_id", "=", session.user.id)
       .groupBy("wallet_budget.budget_id")
       .orderBy("wallet_budget.budget_name")
       .select(({ fn }) => [

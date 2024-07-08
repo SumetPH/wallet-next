@@ -1,14 +1,17 @@
 import type { NextRequest } from "next/server";
 import { v4 as uuid } from "uuid";
-import db from "@/configs/db";
+import db from "@/lib/db";
 import { z } from "zod";
+import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = req.cookies.get("user_id")?.value;
-    if (!userId) return Response.json("user_id not found", { status: 404 });
+    const session = await getSession();
+    if (!session) {
+      return Response.json({ message: "unauthorized" }, { status: 401 });
+    }
 
     const bodySchema = z.object({
       account_name: z.string().min(1),
@@ -25,7 +28,7 @@ export async function POST(req: NextRequest) {
         account_id: uuid(),
         account_name: body.account_name,
         account_type_id: body.account_type_id,
-        user_id: userId,
+        user_id: session.user.id,
         account_balance: body.account_balance,
         account_created_at: body.account_start_date,
       })

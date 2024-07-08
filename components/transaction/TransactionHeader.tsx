@@ -1,23 +1,19 @@
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from "@nextui-org/react";
-import React, { useRef, useState } from "react";
-import { MdOutlineMoreHoriz } from "react-icons/md";
-import {
-  TransactionFormModal,
-  TransactionFormModalRef,
-} from "./TransactionFormModal";
+import React, { useState } from "react";
+import TransactionFormDialog from "./TransactionFormDialog";
 import { CategoryType } from "@/services/category/useCategoryList";
+import { Ellipsis } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 type Props = {
-  onCreateOrUpdate: () => void;
+  onSuccess: () => void;
 };
 
-export default function TransactionHeader({ onCreateOrUpdate }: Props) {
-  const transactionFormModalRef = useRef<TransactionFormModalRef>(null);
+export default function TransactionHeader({ onSuccess }: Props) {
   const [categoryType, setCategoryType] = useState(CategoryType.expense);
 
   return (
@@ -25,41 +21,39 @@ export default function TransactionHeader({ onCreateOrUpdate }: Props) {
       <div className="flex justify-between gap-2 mb-2">
         <section className="text-lg font-medium">รายการใช้จ่าย</section>
         <section>
-          <Dropdown>
-            <DropdownTrigger>
-              <button>
-                <MdOutlineMoreHoriz size={24} />
-              </button>
-            </DropdownTrigger>
-            <DropdownMenu>
-              <DropdownItem
-                key="addExpense"
-                onPress={() => {
-                  transactionFormModalRef.current?.openModal();
-                }}
-              >
-                เพิ่มรายจ่าย
-              </DropdownItem>
-              <DropdownItem
-                key="addIncome"
-                onPress={() => {
-                  setCategoryType(CategoryType.income);
-                  transactionFormModalRef.current?.openModal();
-                }}
-              >
-                เพิ่มรายรับ
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+          <TransactionFormDialog
+            mode="create"
+            categoryType={categoryType}
+            onSuccess={onSuccess}
+          >
+            {({ openDialog }) => (
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Ellipsis />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setCategoryType(CategoryType.expense);
+                      openDialog();
+                    }}
+                  >
+                    เพิ่มรายจ่าย
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setCategoryType(CategoryType.income);
+                      openDialog();
+                    }}
+                  >
+                    เพิ่มรายรับ
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </TransactionFormDialog>
         </section>
       </div>
-
-      <TransactionFormModal
-        ref={transactionFormModalRef}
-        mode="create"
-        categoryType={categoryType}
-        onCreateOrUpdate={onCreateOrUpdate}
-      />
     </>
   );
 }

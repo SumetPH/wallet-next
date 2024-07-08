@@ -1,4 +1,3 @@
-import { axiosWithToken } from "@/services/axiosWithToken";
 import { Account } from "@/services/account/useAccountList";
 import {
   Button,
@@ -34,13 +33,13 @@ export const AccountDeleteModal = forwardRef<AccountDeleteModalRef, Props>(
 
     const deleteAccount = async () => {
       try {
-        await axiosWithToken({
-          url: "/account-delete",
-          method: "DELETE",
-          data: {
-            account_id: account.account_id,
-          },
-        });
+        // await axiosWithToken({
+        //   url: "/account-delete",
+        //   method: "DELETE",
+        //   data: {
+        //     account_id: account.account_id,
+        //   },
+        // });
       } catch (error) {
         console.error(error);
       } finally {

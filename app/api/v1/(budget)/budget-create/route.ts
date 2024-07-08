@@ -1,15 +1,18 @@
 import type { NextRequest } from "next/server";
 import { v4 as uuid } from "uuid";
-import db from "@/configs/db";
+import db from "@/lib/db";
 import { z } from "zod";
 import dayjs from "dayjs";
+import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = req.cookies.get("user_id")?.value;
-    if (!userId) return Response.json("user_id not found", { status: 404 });
+    const session = await getSession();
+    if (!session) {
+      return Response.json({ message: "unauthorized" }, { status: 401 });
+    }
 
     const schema = z.object({
       budget_name: z.string().min(1),
@@ -28,7 +31,7 @@ export async function POST(req: NextRequest) {
         budget_name: body.budget_name,
         budget_created_at: body.budget_created_at,
         category_id: body.category_id,
-        user_id: userId,
+        user_id: session.user.id,
         budget_updated_at: dayjs().format("YYYY-MM-DD HH:mm:ss"),
       })
       .executeTakeFirstOrThrow();

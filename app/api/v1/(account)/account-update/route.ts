@@ -1,14 +1,17 @@
 import type { NextRequest } from "next/server";
 import dayjs from "dayjs";
-import db from "@/configs/db";
+import db from "@/lib/db";
 import { z } from "zod";
+import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function PUT(req: NextRequest) {
   try {
-    const userId = req.cookies.get("user_id")?.value;
-    if (!userId) return Response.json("user_id not found", { status: 404 });
+    const session = await getSession();
+    if (!session) {
+      return Response.json({ message: "unauthorized" }, { status: 401 });
+    }
 
     const bodySchema = z.object({
       account_id: z.string().min(1),
@@ -28,7 +31,7 @@ export async function PUT(req: NextRequest) {
         account_updated_at: dayjs().format("YYYY-MM-DD HH:mm:ss"),
       })
       .where("account_id", "=", body.account_id)
-      .where("user_id", "=", userId)
+      .where("user_id", "=", session.user.id)
       .executeTakeFirstOrThrow();
 
     return Response.json({ message: "updated successfully" });

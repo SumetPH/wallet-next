@@ -1,7 +1,7 @@
 import { type NextRequest } from "next/server";
 import { z } from "zod";
 import { v4 as uuid } from "uuid";
-import db from "@/configs/db";
+import db from "@/lib/db";
 import dayjs from "dayjs";
 
 export const dynamic = "force-dynamic";

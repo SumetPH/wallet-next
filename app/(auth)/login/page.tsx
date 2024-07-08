@@ -1,99 +1,152 @@
 "use client";
 
-import { axiosWithToken } from "@/services/axiosWithToken";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Input,
-} from "@nextui-org/react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import jsCookie from "js-cookie";
 import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardFooter,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 const schema = z.object({
-  username: z.string().min(1, "กรุณากรอกชื่อผู้ใช้งาน"),
-  password: z.string().min(1, "กรุณากรอกรหัสผ่าน"),
+  email: z.string().email({ message: "รูปแบบอีเมลไม่ถูกต้อง" }),
+  password: z.string().min(6, { message: "รหัสผ่านต้องมีอย่างน้อย 6 ตัว" }),
 });
 
 type FormData = z.infer<typeof schema>;
 
 export default function Login() {
   const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      username: "Test",
+      email: "test@test.com",
       password: "testtest",
     },
   });
 
   const submit = async (data: FormData) => {
     try {
-      const res = await axiosWithToken<{
-        token: string;
-        user: any;
-      }>({
-        url: "/auth/login",
+      const res = await fetch("/api/auth/credential/login", {
         method: "POST",
-        data: {
-          username: data.username,
+        body: JSON.stringify({
+          email: data.email,
           password: data.password,
-        },
+        }),
       });
+      const json: { message: string } = await res.json();
+
       if (res.status === 200) {
-        jsCookie.set("token", res.data.token, { expires: 30 });
-        jsCookie.set("user", JSON.stringify(res.data.user), { expires: 30 });
-        jsCookie.set("user_id", res.data.user.user_id, { expires: 30 });
+        toast({
+          title: "เข้าสู่ระบบสําเร็จ",
+        });
         router.push("/transaction");
+      } else {
+        toast({
+          title: "ข้อผิดพลาด",
+          description: json.message,
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error(error);
-      alert("ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง");
+      toast({
+        title: "ข้อผิดพลาด",
+        description: "เกิดข้อผิดพลาด",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const googleLogin = async (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    const res = await fetch("/api/auth/google");
+    const json = await res.json();
+    if (res.status === 200) {
+      window.location.href = json.url;
     }
   };
 
   return (
-    <form onSubmit={form.handleSubmit(submit)}>
-      <div className="container mx-auto min-h-dvh flex justify-center items-center">
-        <Card className="w-full sm:w-2/3 md:w-1/2 lg:w-1/2 xl:w-1/3 p-6">
-          <CardHeader className="justify-center font-medium text-xl">
-            Wallet
-          </CardHeader>
-          <CardBody>
-            <div className="mb-8">
-              <Input
-                {...form.register("username")}
-                label="ชื่อผู้ใช้งาน"
-                fullWidth
-                isInvalid={!!form.formState.errors.username?.message}
-                errorMessage={form.formState.errors.username?.message}
+    <div className="flex h-dvh items-center justify-center">
+      <Card className="w-full sm:w-1/2 lg:w-1/3 2xl:p-12">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(submit)}>
+            <CardHeader>
+              <span className="text-2xl font-semibold text-center">
+                Wallet Next
+              </span>
+            </CardHeader>
+            <CardContent>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem className="mb-4">
+                    <FormLabel>อีเมล</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div>
-              <Input
-                {...form.register("password")}
-                label="รหัสผ่าน"
-                type="password"
-                fullWidth
-                isInvalid={!!form.formState.errors.password?.message}
-                errorMessage={form.formState.errors.password?.message}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem className="mb-4">
+                    <FormLabel>รหัสผ่าน</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          </CardBody>
-          <CardFooter className="justify-end">
-            <Button type="submit" color="primary">
-              เข้าสู่ระบบ
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    </form>
+            </CardContent>
+            <CardFooter className="block ">
+              <section>
+                <Button className="w-full" type="submit">
+                  เข้าสู่ระบบ
+                </Button>
+              </section>
+              <hr className="my-8" />
+              <section>
+                <Button className="w-full bg-sky-600" onClick={googleLogin}>
+                  Google
+                </Button>
+              </section>
+            </CardFooter>
+          </form>
+        </Form>
+      </Card>
+    </div>
   );
 }

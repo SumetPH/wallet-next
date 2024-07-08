@@ -1,15 +1,12 @@
 import type { NextRequest } from "next/server";
 import dayjs from "dayjs";
-import db from "@/configs/db";
+import db from "@/lib/db";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
 export async function PUT(req: NextRequest) {
   try {
-    const userId = req.cookies.get("user_id")?.value;
-    if (!userId) return Response.json("user_id not found", { status: 404 });
-
     const schema = z.object({
       budget_id: z.string().min(1),
       budget_name: z.string().min(1).optional(),

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { forwardRef, useImperativeHandle } from "react";
-import dayjs from "dayjs";
 import {
   Modal,
   ModalContent,
@@ -21,7 +20,6 @@ import useAccountTypeList from "@/services/accountType/useAccountTypeList";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { axiosWithToken } from "@/services/axiosWithToken";
 import { Account } from "@/services/account/useAccountList";
 
 const schema = z.object({
@@ -49,8 +47,8 @@ export type AccountFormModalRef = {
 };
 
 export const AccountFormModal = forwardRef<AccountFormModalRef, Props>(
-  ({ account, mode = "create", onUpdated }, ref) => {
-    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  ({ account, mode = "create" }, ref) => {
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     const openModal = () => {
       form.reset({
@@ -76,56 +74,56 @@ export const AccountFormModal = forwardRef<AccountFormModalRef, Props>(
 
     const accountTypeList = useAccountTypeList({ enable: isOpen });
 
-    const submit = (data: FormData) => {
+    const submit = () => {
       if (mode === "create") {
-        createAccount(data);
+        createAccount();
       } else {
-        updateAccount(data);
+        updateAccount();
       }
     };
 
-    const createAccount = async (data: FormData) => {
+    const createAccount = async () => {
       try {
-        const res = await axiosWithToken({
-          url: "/account-create",
-          method: "POST",
-          data: {
-            account_name: data.accountName,
-            account_type_id: [...data.accountTypeId][0],
-            account_balance: data.balance,
-            account_start_date: dayjs(data.startDate).format(
-              "YYYY-MM-DD HH:mm:ss"
-            ),
-          },
-        });
-        if (res.status === 200) {
-          onOpenChange();
-          if (onUpdated) onUpdated();
-        }
+        // const res = await axiosWithToken({
+        //   url: "/account-create",
+        //   method: "POST",
+        //   data: {
+        //     account_name: data.accountName,
+        //     account_type_id: [...data.accountTypeId][0],
+        //     account_balance: data.balance,
+        //     account_start_date: dayjs(data.startDate).format(
+        //       "YYYY-MM-DD HH:mm:ss"
+        //     ),
+        //   },
+        // });
+        // if (res.status === 200) {
+        //   onOpenChange();
+        //   if (onUpdated) onUpdated();
+        // }
       } catch (error) {
         console.error(error);
       }
     };
 
-    const updateAccount = async (data: FormData) => {
+    const updateAccount = async () => {
       try {
-        const res = await axiosWithToken({
-          url: "/account-update",
-          method: "PUT",
-          data: {
-            account_id: account?.account_id,
-            account_name: data.accountName,
-            account_type_id: [...data.accountTypeId][0],
-            account_balance: data.balance,
-            account_start_date: dayjs(data.startDate).format(
-              "YYYY-MM-DD HH:mm:ss"
-            ),
-          },
-        });
-        if (res.status === 200) {
-          onOpenChange();
-          if (onUpdated) onUpdated();
-        }
+        // const res = await axiosWithToken({
+        //   url: "/account-update",
+        //   method: "PUT",
+        //   data: {
+        //     account_id: account?.account_id,
+        //     account_name: data.accountName,
+        //     account_type_id: [...data.accountTypeId][0],
+        //     account_balance: data.balance,
+        //     account_start_date: dayjs(data.startDate).format(
+        //       "YYYY-MM-DD HH:mm:ss"
+        //     ),
+        //   },
+        // });
+        // if (res.status === 200) {
+        //   onOpenChange();
+        //   if (onUpdated) onUpdated();
+        // }
       } catch (error) {
         console.error(error);
       }
@@ -160,7 +158,7 @@ export const AccountFormModal = forwardRef<AccountFormModalRef, Props>(
                   <Controller
                     control={form.control}
                     name="accountTypeId"
-                    render={({ field, formState }) => (
+                    render={({ field }) => (
                       <Select
                         label="ชนิดบัญชี"
                         placeholder="เลือก"
@@ -200,7 +198,7 @@ export const AccountFormModal = forwardRef<AccountFormModalRef, Props>(
                   <Controller
                     control={form.control}
                     name="startDate"
-                    render={({ field, formState }) => (
+                    render={({ field }) => (
                       <I18nProvider locale="en-UK">
                         <DatePicker
                           label="วันเริ่มต้น"

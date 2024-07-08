@@ -9,7 +9,6 @@ import {
   MdOutlinePieChartOutline,
   MdOutlineCategory,
 } from "react-icons/md";
-import jsCookie from "js-cookie";
 import clsx from "clsx";
 
 export default function BottomBar() {
@@ -17,8 +16,6 @@ export default function BottomBar() {
   const pathname = usePathname();
 
   const logout = () => {
-    jsCookie.remove("user");
-    jsCookie.remove("token");
     router.replace("/login");
   };
 

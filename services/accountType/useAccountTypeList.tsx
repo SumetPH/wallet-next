@@ -1,7 +1,6 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { axiosWithToken } from "../axiosWithToken";
 
 type AccountType = {
   account_type_id: string;
@@ -18,11 +17,11 @@ export default function useAccountTypeList({ enable = true }: Props) {
   const accountTypeList = useQuery({
     enabled: enable,
     queryKey: ["/account-type-list"],
-    queryFn: () =>
-      axiosWithToken<AccountType[]>({
-        url: `/account-type-list`,
-        method: "GET",
-      }).then((res) => res.data),
+    queryFn: async () => {
+      const res = await fetch(`/api/v1/account-type-list`);
+      const json: AccountType[] = await res.json();
+      return json;
+    },
   });
 
   return accountTypeList;
