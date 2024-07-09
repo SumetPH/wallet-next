@@ -51,7 +51,7 @@ export const lucia = new Lucia(adapter, {
 export const googleAuth = new Google(
   process.env.AUTH_GOOGLE_ID!,
   process.env.AUTH_GOOGLE_SECRET!,
-  "http://localhost:3010/api/auth/google/callback"
+  process.env.AUTH_GOOGLE_CALLBACK_URL!
 );
 
 export async function getSession() {

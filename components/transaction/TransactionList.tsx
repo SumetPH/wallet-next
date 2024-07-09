@@ -19,13 +19,13 @@ import { CategoryType } from "@/services/category/useCategoryList";
 
 type Props = {
   transactionRes?: TransactionRes[];
-  isLoading?: boolean;
+  isLoading: boolean;
   onSuccess: () => void;
 };
 
 export default function TransactionList({
-  transactionRes = [],
-  isLoading = false,
+  transactionRes,
+  isLoading,
   onSuccess,
 }: Props) {
   return (
@@ -34,10 +34,10 @@ export default function TransactionList({
 
       <SkeletonLoading
         isLoading={isLoading}
-        dataLength={transactionRes.length}
+        dataLength={transactionRes?.length}
       />
 
-      {transactionRes.map((item) => (
+      {transactionRes?.map((item) => (
         <div key={item.date}>
           <div className="flex justify-between gap-2 p-1 bg-gray-100 dark:bg-gray-800 font-medium">
             <span className="text-sm">{item.date}</span>

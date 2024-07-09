@@ -6,10 +6,10 @@ type Props = {
   children: React.ReactNode;
 };
 
-export default async function PagesLayout({ children }: Props) {
+export default async function AuthLayout({ children }: Props) {
   // check authentication
   const session = await getSession();
-  if (!session) return redirect("/login");
+  if (session) return redirect("/transaction");
 
   return children;
 }

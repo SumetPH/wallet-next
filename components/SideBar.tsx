@@ -2,23 +2,16 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import {
-  MdOutlineHome,
-  MdOutlineAccountBalance,
-  MdOutlineLogout,
-  MdOutlinePieChartOutline,
-  MdOutlineCategory,
-} from "react-icons/md";
+import { House, Notebook, LogOut, PieChart, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useToast } from "./ui/use-toast";
 import jsCookie from "js-cookie";
+import { toast } from "./ui/use-toast";
 
 export default function Sidebar() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
-  const { toast } = useToast();
 
   const logout = async () => {
     try {
@@ -29,7 +22,7 @@ export default function Sidebar() {
         toast({
           title: "ออกจากระบบสําเร็จ",
         });
-        router.push("/login");
+        window.location.href = "/transaction";
       } else {
         toast({
           title: "ข้อผิดพลาด",
@@ -59,28 +52,28 @@ export default function Sidebar() {
             className="justify-start  gap-2 "
             onClick={() => router.push("/transaction")}
           >
-            <MdOutlineHome size={22} />
+            <House size={20} />
             <span className="text-base font-medium">หน้าแรก</span>
           </Button>
           <Button
             className="justify-start gap-2"
             onClick={() => router.push("/account")}
           >
-            <MdOutlineAccountBalance size={22} />
+            <Notebook size={20} />
             <span className="text-base font-medium">บัญชี</span>
           </Button>
           <Button
             className="justify-start gap-2"
             onClick={() => router.push("/category")}
           >
-            <MdOutlineCategory size={22} />
+            <Layers size={20} />
             <span className="text-base font-medium">หมวดหมู่</span>
           </Button>
           <Button
             className="justify-start gap-2"
             onClick={() => router.push("/budget")}
           >
-            <MdOutlinePieChartOutline size={22} />
+            <PieChart size={20} />
             <span className="text-base font-medium">งบประมาณ</span>
           </Button>
         </div>
@@ -99,7 +92,7 @@ export default function Sidebar() {
           <span className="capitalize">{theme}</span>
         </Button>
         <Button className="justify-start gap-2 w-full" onClick={logout}>
-          <MdOutlineLogout size={22} />
+          <LogOut size={20} />
           <span className="text-base font-medium">ออกจากระบบ</span>
         </Button>
       </div>

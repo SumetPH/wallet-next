@@ -1,17 +1,5 @@
-"use client";
-
-import CurrencyInput from "react-currency-input-field";
-import dayjs from "dayjs";
+import { Account } from "@/services/account/useAccountList";
 import React, { useState } from "react";
-import useAccountList from "@/services/account/useAccountList";
-import { Button } from "../ui/button";
-import { Calendar } from "../ui/calendar";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { TimePicker } from "../ui/time-picker/time-picker";
-import { Transaction } from "@/services/transaction/useTransactionList";
-import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -25,10 +13,7 @@ import {
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
-  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
@@ -40,99 +25,88 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import useCategoryList, {
-  CategoryType,
-} from "@/services/category/useCategoryList";
+import { useForm } from "react-hook-form";
+import dayjs from "dayjs";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import useAccountTypeList from "@/services/accountType/useAccountTypeList";
+import CurrencyInput from "react-currency-input-field";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Calendar } from "../ui/calendar";
+import { TimePicker } from "../ui/time-picker/time-picker";
 import { toast } from "../ui/use-toast";
 
 type Props = {
   children: ({ openDialog }: { openDialog: () => void }) => React.ReactNode;
-  transaction?: Transaction;
+  account?: Account;
   mode: "create" | "edit";
-  categoryType: CategoryType;
   onSuccess?: () => void;
 };
 
 const schema = z.object({
-  transactionAmount: z
+  accountName: z
+    .string({ required_error: "กรุณากรอกชื่อบัญชี" })
+    .min(1, { message: "กรุณากรอกชื่อบัญชี" }),
+  accountTypeId: z
+    .string({ required_error: "กรุณาเลือกประเภทบัญชี" })
+    .min(1, { message: "กรุณาเลือกประเภทบัญชี" }),
+  balance: z
     .string({ required_error: "กรุณากรอกจํานวนเงิน" })
-    .min(1, { message: "กรุณากรอกจํานวนเงิน" })
-    .regex(/^\d+(\.\d{2})?$/, {
-      message: "รูปแบบจำนวนเงินไม่ถูกต้อง",
-    }),
-  accountId: z
-    .string({ required_error: "กรุณาเลือกบัญชี" })
-    .min(1, { message: "กรุณาเลือกบัญชี" }),
-  categoryId: z
-    .string({ required_error: "กรุณาเลือกหมวดหมู่" })
-    .min(1, { message: "กรุณาเลือกหมวดหมู่" }),
-  transactionNote: z.string().optional(),
+    .min(1, { message: "กรุณากรอกจํานวนเงิน" }),
   createdAt: z.date({ required_error: "กรุณาเลือกวันที่" }),
 });
 
 type FormData = z.infer<typeof schema>;
 
-export default function TransactionFormDialog({
+export default function AccountFormDialog({
   children,
-  transaction,
   mode,
-  categoryType,
+  account,
   onSuccess,
 }: Props) {
   const [dialog, setDialog] = useState(false);
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      transactionAmount: "",
-      accountId: "",
-      categoryId: "",
-      transactionNote: "",
+      accountName: "",
+      accountTypeId: "",
+      balance: "",
       createdAt: dayjs().toDate(),
     },
   });
 
-  const accountList = useAccountList({
-    enable: dialog,
-  });
-
-  const categoryList = useCategoryList({
-    enable: dialog,
-    categoryType: categoryType,
-  });
+  const accountTypeList = useAccountTypeList({ enable: dialog });
 
   const openDialog = () => {
     setDialog(true);
 
-    if (transaction && mode === "edit") {
-      form.setValue("transactionAmount", transaction.transaction_amount);
-      form.setValue("accountId", transaction.account_id);
-      form.setValue("categoryId", transaction.category_id);
-      form.setValue("transactionNote", transaction.transaction_note);
-      form.setValue(
-        "createdAt",
-        dayjs(transaction.transaction_created_at).toDate()
-      );
+    if (account && mode === "edit") {
+      form.setValue("accountName", account.account_name);
+      form.setValue("accountTypeId", account.account_type_id);
+      form.setValue("balance", account.account_balance);
+      form.setValue("createdAt", dayjs(account.account_created_at).toDate());
     }
   };
 
   const submit = (data: FormData) => {
     if (mode === "create") {
-      createTransaction(data);
+      createAccount(data);
     } else {
       updateAccount(data);
     }
   };
 
-  const createTransaction = async (data: FormData) => {
+  const createAccount = async (data: FormData) => {
     try {
-      const res = await fetch("/api/v1/transaction-create", {
+      const res = await fetch("/api/v1/account-create", {
         method: "POST",
         body: JSON.stringify({
-          account_id: data.accountId,
-          category_id: data.categoryId,
-          transaction_amount: data.transactionAmount,
-          transaction_note: data.transactionNote,
-          transaction_created_at: dayjs(data.createdAt).format(
+          account_name: data.accountName,
+          account_type_id: data.accountTypeId,
+          account_balance: data.balance,
+          account_start_date: dayjs(data.createdAt).format(
             "YYYY-MM-DD HH:mm:ss"
           ),
         }),
@@ -157,15 +131,14 @@ export default function TransactionFormDialog({
 
   const updateAccount = async (data: FormData) => {
     try {
-      const res = await fetch("/api/v1/transaction-update", {
+      const res = await fetch("/api/v1/account-update", {
         method: "PUT",
         body: JSON.stringify({
-          transaction_id: transaction?.transaction_id,
-          account_id: data.accountId,
-          category_id: data.categoryId,
-          transaction_amount: data.transactionAmount,
-          transaction_note: data.transactionNote,
-          transaction_created_at: dayjs(data.createdAt).format(
+          account_id: account!.account_id,
+          account_name: data.accountName,
+          account_type_id: data.accountTypeId,
+          account_balance: data.balance,
+          account_start_date: dayjs(data.createdAt).format(
             "YYYY-MM-DD HH:mm:ss"
           ),
         }),
@@ -190,7 +163,6 @@ export default function TransactionFormDialog({
   return (
     <>
       {children({ openDialog })}
-
       <Dialog open={dialog} onOpenChange={(value) => setDialog(value)}>
         <DialogContent
           onEscapeKeyDown={(e) => e.preventDefault()}
@@ -201,28 +173,22 @@ export default function TransactionFormDialog({
             <form onSubmit={form.handleSubmit(submit)}>
               <DialogHeader>
                 <DialogTitle className="mb-4">
-                  {categoryType === CategoryType.expense ? (
-                    <span className="text-red-600">รายจ่าย</span>
-                  ) : (
-                    <span className="text-green-600">รายรับ</span>
-                  )}
+                  {mode === "create" ? "เพิ่มบัญชี" : "แก้ไขบัญชี"}
                 </DialogTitle>
                 <DialogDescription></DialogDescription>
               </DialogHeader>
               <div>
                 <FormField
                   control={form.control}
-                  name="transactionAmount"
+                  name="accountName"
                   render={({ field }) => (
                     <FormItem className="mb-4">
-                      <FormLabel>จํานวน</FormLabel>
+                      <FormLabel>ชื่อบัญชี</FormLabel>
                       <FormControl>
-                        <CurrencyInput
-                          placeholder="จํานวน"
-                          className="input-currency"
+                        <Input
                           defaultValue={field.value}
-                          decimalsLimit={2}
-                          onValueChange={(value) => field.onChange(value)}
+                          onChange={field.onChange}
+                          placeholder="ชื่อบัญชี"
                         />
                       </FormControl>
                       <FormMessage />
@@ -232,45 +198,37 @@ export default function TransactionFormDialog({
 
                 <FormField
                   control={form.control}
-                  name="accountId"
+                  name="accountTypeId"
                   render={({ field }) => (
                     <FormItem className="mb-4">
-                      <FormLabel>บัญชี</FormLabel>
+                      <FormLabel>ประเภทบัญชี</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="เลือกบัญชี" />
+                            <SelectValue placeholder="เลือกประเภทบัญชี" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {accountList.isLoading && (
+                          {accountTypeList.isLoading && (
                             <SelectItem value="loading" disabled>
                               กำลังโหลด...
                             </SelectItem>
                           )}
-                          {accountList.data?.length === 0 && (
+                          {accountTypeList.data?.length === 0 && (
                             <SelectItem value="empty" disabled>
                               ไม่พบหมวดหมู่
                             </SelectItem>
                           )}
-                          {accountList.data?.map((accountType) => (
-                            <SelectGroup key={accountType.account_type_id}>
-                              <SelectLabel>
-                                {accountType.account_type_name}
-                              </SelectLabel>
-                              {accountType.accounts.map((account) => (
-                                <SelectItem
-                                  key={account.account_id}
-                                  value={account.account_id}
-                                >
-                                  {account.account_name}
-                                </SelectItem>
-                              ))}
-                              <SelectSeparator />
-                            </SelectGroup>
+                          {accountTypeList.data?.map((accountType) => (
+                            <SelectItem
+                              key={accountType.account_type_id}
+                              value={accountType.account_type_id}
+                            >
+                              {accountType.account_type_name}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -281,40 +239,19 @@ export default function TransactionFormDialog({
 
                 <FormField
                   control={form.control}
-                  name="categoryId"
+                  name="balance"
                   render={({ field }) => (
                     <FormItem className="mb-4">
-                      <FormLabel>หมวดหมู่</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="เลือกหมวดหมู่" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {categoryList.isLoading && (
-                            <SelectItem value="loading" disabled>
-                              กำลังโหลด...
-                            </SelectItem>
-                          )}
-                          {categoryList.data?.length === 0 && (
-                            <SelectItem value="empty" disabled>
-                              ไม่พบหมวดหมู่
-                            </SelectItem>
-                          )}
-                          {categoryList.data?.map((category) => (
-                            <SelectItem
-                              key={category.category_id}
-                              value={category.category_id}
-                            >
-                              {category.category_name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormLabel>ยอดเริ่มต้น</FormLabel>
+                      <FormControl>
+                        <CurrencyInput
+                          placeholder="จํานวน"
+                          className="input-currency"
+                          defaultValue={field.value}
+                          decimalsLimit={2}
+                          onValueChange={(value) => field.onChange(value)}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

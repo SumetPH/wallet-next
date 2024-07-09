@@ -21,6 +21,7 @@ import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Account } from "@/services/account/useAccountList";
+import dayjs from "dayjs";
 
 const schema = z.object({
   accountName: z.string().min(1, { message: "กรุณากรอกชื่อบัญชี" }),
@@ -38,7 +39,7 @@ type FormData = z.infer<typeof schema>;
 
 type Props = {
   account?: Account;
-  mode?: "create" | "edit";
+  mode: "create" | "edit";
   onUpdated?: () => void;
 };
 
@@ -47,7 +48,7 @@ export type AccountFormModalRef = {
 };
 
 export const AccountFormModal = forwardRef<AccountFormModalRef, Props>(
-  ({ account, mode = "create" }, ref) => {
+  ({ account, mode, onUpdated }, ref) => {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     const openModal = () => {
@@ -74,15 +75,15 @@ export const AccountFormModal = forwardRef<AccountFormModalRef, Props>(
 
     const accountTypeList = useAccountTypeList({ enable: isOpen });
 
-    const submit = () => {
+    const submit = (data: FormData) => {
       if (mode === "create") {
-        createAccount();
+        createAccount(data);
       } else {
-        updateAccount();
+        updateAccount(data);
       }
     };
 
-    const createAccount = async () => {
+    const createAccount = async (data: FormData) => {
       try {
         // const res = await axiosWithToken({
         //   url: "/account-create",
@@ -96,34 +97,45 @@ export const AccountFormModal = forwardRef<AccountFormModalRef, Props>(
         //     ),
         //   },
         // });
-        // if (res.status === 200) {
-        //   onOpenChange();
-        //   if (onUpdated) onUpdated();
-        // }
+        const res = await fetch("/api/v1/account-create", {
+          method: "POST",
+          body: JSON.stringify({
+            account_name: data.accountName,
+            account_type_id: data.accountTypeId,
+            account_balance: data.balance,
+            account_start_date: dayjs(data.startDate).format(
+              "YYYY-MM-DD HH:mm:ss"
+            ),
+          }),
+        });
+
+        if (res.status === 200) {
+          onOpenChange();
+          if (onUpdated) onUpdated();
+        }
       } catch (error) {
         console.error(error);
       }
     };
 
-    const updateAccount = async () => {
+    const updateAccount = async (data: FormData) => {
       try {
-        // const res = await axiosWithToken({
-        //   url: "/account-update",
-        //   method: "PUT",
-        //   data: {
-        //     account_id: account?.account_id,
-        //     account_name: data.accountName,
-        //     account_type_id: [...data.accountTypeId][0],
-        //     account_balance: data.balance,
-        //     account_start_date: dayjs(data.startDate).format(
-        //       "YYYY-MM-DD HH:mm:ss"
-        //     ),
-        //   },
-        // });
-        // if (res.status === 200) {
-        //   onOpenChange();
-        //   if (onUpdated) onUpdated();
-        // }
+        const res = await fetch("/api/v1/account-update", {
+          method: "PUT",
+          body: JSON.stringify({
+            account_id: account?.account_id,
+            account_name: data.accountName,
+            account_type_id: [...data.accountTypeId][0],
+            account_balance: data.balance,
+            account_start_date: dayjs(data.startDate).format(
+              "YYYY-MM-DD HH:mm:ss"
+            ),
+          }),
+        });
+        if (res.status === 200) {
+          onOpenChange();
+          if (onUpdated) onUpdated();
+        }
       } catch (error) {
         console.error(error);
       }

@@ -4,7 +4,11 @@ import SideBar from "@/components/SideBar";
 import React from "react";
 import BottomBar from "@/components/BottomBar";
 
-export default function Template({ children }: { children: React.ReactNode }) {
+type Props = {
+  children: React.ReactNode;
+};
+
+export default function PagesTemplate({ children }: Props) {
   return (
     <>
       <div className="hidden lg:block w-[280px] bg-stone-400 dark:bg-stone-900 fixed inset-0">

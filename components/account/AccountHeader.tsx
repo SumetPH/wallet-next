@@ -1,48 +1,43 @@
-import React, { useRef } from "react";
-import { MdOutlineMoreHoriz } from "react-icons/md";
+import React from "react";
+import { Ellipsis } from "lucide-react";
 import {
-  Dropdown,
-  DropdownTrigger,
   DropdownMenu,
-  DropdownItem,
-} from "@nextui-org/react";
-import { AccountFormModalRef } from "@/components/account/AccountFormModal";
-import { AccountFormModal } from "@/components/account/AccountFormModal";
-import { useQueryClient } from "@tanstack/react-query";
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import AccountFormDialog from "./AccountFormDialog";
 
-export default function AccountHeader() {
-  const AccountFormModalRef = useRef<AccountFormModalRef>(null);
-  const queryClient = useQueryClient();
+type Props = {
+  onSuccess: () => void;
+};
 
+export default function AccountHeader({ onSuccess }: Props) {
   return (
     <>
       <div className="flex justify-between gap-2 mb-2">
         <section className="text-lg font-medium">บัญชี</section>
         <section>
-          <Dropdown>
-            <DropdownTrigger>
-              <button>
-                <MdOutlineMoreHoriz size={24} />
-              </button>
-            </DropdownTrigger>
-            <DropdownMenu>
-              <DropdownItem
-                key="accountAdd"
-                onPress={() => AccountFormModalRef.current?.openModal()}
-              >
-                เพิ่มบัญชี
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+          <AccountFormDialog mode="create" onSuccess={onSuccess}>
+            {({ openDialog }) => (
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Ellipsis />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      openDialog();
+                    }}
+                  >
+                    เพิ่มบัญชี
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </AccountFormDialog>
         </section>
       </div>
-
-      <AccountFormModal
-        ref={AccountFormModalRef}
-        onUpdated={() =>
-          queryClient.invalidateQueries({ queryKey: ["/account-list"] })
-        }
-      />
     </>
   );
 }

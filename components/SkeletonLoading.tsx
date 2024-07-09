@@ -1,5 +1,5 @@
-import { Skeleton } from "@nextui-org/react";
 import React from "react";
+import { Skeleton } from "./ui/skeleton";
 
 type Props = {
   isLoading: boolean;
@@ -14,8 +14,9 @@ export default function SkeletonLoading({
     <>
       {isLoading && (
         <div className="my-6">
-          <Skeleton className="h-6 w-full rounded-lg my-4" />
-          <Skeleton className="h-36 w-full rounded-lg my-4" />
+          <Skeleton className="h-6 w-full my-4" />
+          <Skeleton className="h-6 w-full my-4" />
+          <Skeleton className="h-24 w-full my-4" />
         </div>
       )}
 

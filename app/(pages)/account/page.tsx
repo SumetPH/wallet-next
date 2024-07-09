@@ -1,62 +1,19 @@
 "use client";
 
-import AccountHeader from "@/components/account/AccountHeader";
 import useAccountList from "@/services/account/useAccountList";
 import React from "react";
-import clsx from "clsx";
-import AccountRow from "@/components/account/AccountRow";
-import numeral from "numeral";
-import SkeletonLoading from "@/components/SkeletonLoading";
+import AccountList from "@/components/account/AccountList";
 
 export default function AccountPage() {
   const accountList = useAccountList({
     enable: true,
   });
 
-  const amountColor = (amount: string, accountTypeId: string) => {
-    // 3 = บัตรเครดิต
-    if (amount.includes("-") || ["3", "4"].includes(accountTypeId)) {
-      return "text-red-600";
-    }
-    return "text-green-600";
-  };
-
   return (
-    <>
-      <AccountHeader />
-
-      <SkeletonLoading
-        isLoading={accountList.isLoading}
-        dataLength={accountList.data?.length}
-      />
-
-      {accountList.data?.map((item) => (
-        <div key={item.account_type_id}>
-          <div className="flex justify-between gap-2 p-1 bg-gray-100">
-            <span>{item.account_type_name}</span>
-            <span
-              className={clsx(
-                "font-medium",
-                amountColor(item.account_type_balance, item.account_type_id)
-              )}
-            >
-              {numeral(item.account_type_balance).format("0,0.00")} บาท
-            </span>
-          </div>
-
-          {item.accounts.map((account) => (
-            <AccountRow
-              key={account.account_id}
-              account={account}
-              amountColor={amountColor(
-                account.net_balance,
-                account.account_type_id
-              )}
-              onUpdated={() => accountList.refetch()}
-            />
-          ))}
-        </div>
-      ))}
-    </>
+    <AccountList
+      accountTypeList={accountList.data ?? []}
+      isLoading={accountList.isLoading}
+      onSuccess={() => accountList.refetch()}
+    />
   );
 }

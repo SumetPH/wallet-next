@@ -9,7 +9,7 @@ export default function TransactionPage() {
 
   return (
     <TransactionList
-      transactionRes={transactionList.data}
+      transactionRes={transactionList.data ?? []}
       isLoading={transactionList.isLoading}
       onSuccess={() => transactionList.refetch()}
     />

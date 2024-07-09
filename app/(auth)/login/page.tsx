@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -21,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast";
 
 const schema = z.object({
   email: z.string().email({ message: "รูปแบบอีเมลไม่ถูกต้อง" }),
@@ -31,9 +30,6 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function Login() {
-  const router = useRouter();
-  const { toast } = useToast();
-
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -57,7 +53,7 @@ export default function Login() {
         toast({
           title: "เข้าสู่ระบบสําเร็จ",
         });
-        router.push("/transaction");
+        window.location.href = "/transaction";
       } else {
         toast({
           title: "ข้อผิดพลาด",

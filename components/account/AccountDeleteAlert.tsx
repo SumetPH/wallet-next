@@ -9,29 +9,29 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../ui/alert-dialog";
-import { Transaction } from "@/services/transaction/useTransactionList";
+import { Account } from "@/services/account/useAccountList";
 import { Button } from "../ui/button";
 import { toast } from "../ui/use-toast";
 
 type Props = {
   children: ({ openAlert }: { openAlert: () => void }) => React.ReactNode;
-  transaction: Transaction;
+  account: Account;
   onSuccess: () => void;
 };
 
-export default function TransactionDeleteAlert({
+export default function AccountDeleteAlert({
   children,
-  transaction,
+  account,
   onSuccess,
 }: Props) {
   const [alert, setAlert] = useState(false);
 
-  const deleteTransaction = async () => {
+  const deleteAccount = async () => {
     try {
-      await fetch("/api/v1/transaction-delete", {
+      await fetch("/api/v1/account-delete", {
         method: "DELETE",
         body: JSON.stringify({
-          transaction_id: transaction.transaction_id,
+          account_id: account.account_id,
         }),
       });
 
@@ -62,12 +62,11 @@ export default function TransactionDeleteAlert({
             <AlertDialogDescription></AlertDialogDescription>
           </AlertDialogHeader>
           <div>
-            <section>บัญชี : {transaction.account_name}</section>
-            <section>หมวดหมู่ : {transaction.category_name}</section>
-            <section>จํานวน : {transaction.transaction_amount} บาท</section>
+            <section>บัญชี : {account.account_name}</section>
+            <section>จํานวน : {account.net_balance} บาท</section>
           </div>
           <AlertDialogFooter className="sm:justify-between gap-4 pt-4">
-            <Button className="bg-red-500" onClick={deleteTransaction}>
+            <Button className="bg-red-500" onClick={deleteAccount}>
               ลบ
             </Button>
             <Button onClick={() => setAlert(false)}>ยกเลิก</Button>

@@ -2,72 +2,78 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
-import {
-  MdOutlineHome,
-  MdOutlineAccountBalance,
-  MdOutlineLogout,
-  MdOutlinePieChartOutline,
-  MdOutlineCategory,
-} from "react-icons/md";
+import { House, Notebook, LogOut, PieChart, Layers } from "lucide-react";
 import clsx from "clsx";
+import { toast } from "./ui/use-toast";
 
 export default function BottomBar() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const logout = () => {
-    router.replace("/login");
+  const logout = async () => {
+    try {
+      const res = await fetch("/api/auth/logout");
+      const json: { message: string } = await res.json();
+
+      if (res.status === 200) {
+        toast({
+          title: "ออกจากระบบสําเร็จ",
+        });
+        window.location.href = "/transaction";
+      } else {
+        toast({
+          title: "ข้อผิดพลาด",
+          description: json.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "ข้อผิดพลาด",
+        description: "เกิดข้อผิดพลาด",
+        variant: "destructive",
+      });
+    }
   };
 
   const activeMenu = (path: string) => {
     if (pathname.startsWith(path)) {
-      return "text-blue-200";
+      return "text-white";
     }
-    return "text-white";
+    return "text-stone-600";
   };
 
   return (
     <div className="fixed bottom-0 inset-x-0 lg:hidden p-3 z-10">
-      <div className="bg-slate-500 rounded-xl h-full">
+      <div className="bg-stone-400 dark:bg-stone-900 rounded-xl h-full">
         <div className="grid grid-cols-5 h-10">
           <button
             className="flex justify-center items-center"
             onClick={() => router.push("/transaction")}
           >
-            <MdOutlineHome
-              className={clsx(activeMenu("/transaction"))}
-              size={24}
-            />
+            <House className={clsx(activeMenu("/transaction"))} size={20} />
           </button>
           <button
             className="flex justify-center items-center"
             onClick={() => router.push("/account")}
           >
-            <MdOutlineAccountBalance
-              className={clsx(activeMenu("/account"))}
-              size={24}
-            />
+            <Notebook className={clsx(activeMenu("/account"))} size={20} />
           </button>
           <button
             className="flex justify-center items-center"
             onClick={() => router.push("/category")}
           >
-            <MdOutlineCategory
-              className={clsx(activeMenu("/category"))}
-              size={24}
-            />
+            <Layers className={clsx(activeMenu("/category"))} size={20} />
           </button>
           <button
             className="flex justify-center items-center"
             onClick={() => router.push("/budget")}
           >
-            <MdOutlinePieChartOutline
-              className={clsx(activeMenu("/budget"))}
-              size={24}
-            />
+            <PieChart className={clsx(activeMenu("/budget"))} size={20} />
           </button>
           <button className="flex justify-center items-center" onClick={logout}>
-            <MdOutlineLogout className="text-white" size={24} />
+            <LogOut className="text-stone-600" size={20} />
           </button>
         </div>
       </div>
