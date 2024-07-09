@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { House, Notebook, LogOut, PieChart, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,13 +8,16 @@ import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import jsCookie from "js-cookie";
 import { toast } from "./ui/use-toast";
+import { LoadingSpinner } from "./ui/custom/loading-spinner";
 
 export default function Sidebar() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const [isLoading, setIsLoading] = useState(false);
 
   const logout = async () => {
     try {
+      setIsLoading(true);
       const res = await fetch("/api/auth/logout");
       const json: { message: string } = await res.json();
 
@@ -29,6 +32,7 @@ export default function Sidebar() {
           description: json.message,
           variant: "destructive",
         });
+        setIsLoading(false);
       }
     } catch (error) {
       console.error(error);
@@ -37,6 +41,7 @@ export default function Sidebar() {
         description: "เกิดข้อผิดพลาด",
         variant: "destructive",
       });
+      setIsLoading(false);
     }
   };
 
@@ -91,9 +96,14 @@ export default function Sidebar() {
           <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span className="capitalize">{theme}</span>
         </Button>
-        <Button className="justify-start gap-2 w-full" onClick={logout}>
+        <Button
+          className="justify-start gap-2 w-full"
+          onClick={logout}
+          disabled={isLoading}
+        >
           <LogOut size={20} />
           <span className="text-base font-medium">ออกจากระบบ</span>
+          {isLoading && <LoadingSpinner />}
         </Button>
       </div>
     </div>

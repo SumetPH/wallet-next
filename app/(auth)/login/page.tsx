@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -21,6 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
+import { LoadingSpinner } from "@/components/ui/custom/loading-spinner";
 
 const schema = z.object({
   email: z.string().email({ message: "รูปแบบอีเมลไม่ถูกต้อง" }),
@@ -30,6 +31,8 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function Login() {
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -40,6 +43,7 @@ export default function Login() {
 
   const submit = async (data: FormData) => {
     try {
+      setIsLoading(true);
       const res = await fetch("/api/auth/credential/login", {
         method: "POST",
         body: JSON.stringify({
@@ -60,6 +64,7 @@ export default function Login() {
           description: json.message,
           variant: "destructive",
         });
+        setIsLoading(false);
       }
     } catch (error) {
       console.error(error);
@@ -68,6 +73,7 @@ export default function Login() {
         description: "เกิดข้อผิดพลาด",
         variant: "destructive",
       });
+      setIsLoading(false);
     }
   };
 
@@ -129,8 +135,8 @@ export default function Login() {
             </CardContent>
             <CardFooter className="block ">
               <section>
-                <Button className="w-full" type="submit">
-                  เข้าสู่ระบบ
+                <Button className="w-full" type="submit" disabled={isLoading}>
+                  {isLoading ? <LoadingSpinner /> : "เข้าสู่ระบบ"}
                 </Button>
               </section>
               <hr className="my-8" />
