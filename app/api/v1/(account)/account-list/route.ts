@@ -24,12 +24,18 @@ export async function GET() {
             .selectFrom("transactions")
             .select([
               "transactions.account_id",
-              sql<string>`sum(case when category_type_id = '1' then transaction_amount else 0 end)`.as(
-                "expense"
-              ),
-              sql<string>`sum(case when category_type_id = '2' then transaction_amount else 0 end)`.as(
-                "income"
-              ),
+              sql<string>`sum(
+                case 
+                  when category_type_id = '1' then transaction_amount 
+                  when transfer_type_id = '1' then transaction_amount 
+                  else 0 
+                end)`.as("expense"),
+              sql<string>`sum(
+                case 
+                  when category_type_id = '2' then transaction_amount 
+                  when transfer_type_id = '2' then transaction_amount 
+                  else 0 
+                end)`.as("income"),
             ])
             .groupBy("transactions.account_id")
             .as("t"),

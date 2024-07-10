@@ -35,12 +35,18 @@ export async function GET(req: NextRequest) {
         sql<string>`to_char(date(transaction_created_at), 'YYYY-MM-DD')`.as(
           "date"
         ),
-        sql<string>`coalesce(sum(case when category_type_id = '1' then transaction_amount else 0 end), 0)`.as(
-          "expense"
-        ),
-        sql<string>`coalesce(sum(case when category_type_id = '2' then transaction_amount else 0 end), 0)`.as(
-          "income"
-        ),
+        sql<string>`sum(
+          case 
+            when category_type_id = '1' then transaction_amount 
+            when transfer_type_id = '1' then transaction_amount 
+            else 0 
+          end)`.as("expense"),
+        sql<string>`sum(
+          case 
+            when category_type_id = '2' then transaction_amount 
+            when transfer_type_id = '2' then transaction_amount 
+            else 0 
+          end)`.as("income"),
         sql<string>`
               coalesce(sum(case when category_type_id = '2' then transaction_amount else 0 end), 0) - 
               coalesce(sum(case when category_type_id = '1' then transaction_amount else 0 end), 0)
