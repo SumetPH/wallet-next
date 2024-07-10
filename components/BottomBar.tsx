@@ -45,7 +45,7 @@ export default function BottomBar() {
   };
 
   return (
-    <div className="fixed bottom-0 inset-x-0 lg:hidden p-3 z-10">
+    <div className="sticky bottom-0 bg-stone-300 dark:bg-stone-800 p-3 lg:hidden z-10">
       <div className="bg-stone-400 dark:bg-stone-900 rounded-xl h-full">
         <div className="grid grid-cols-5 h-10">
           <button

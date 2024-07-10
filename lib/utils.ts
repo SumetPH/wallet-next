@@ -6,8 +6,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function amountColor(amount: string) {
-  if (amount === "0") {
-    return "text-gray-600";
+  if (amount === "0.00") {
+    return "text-gray-500";
   }
   if (amount.includes("-")) {
     return "text-red-600";

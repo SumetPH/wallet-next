@@ -14,9 +14,9 @@ export default function PagesTemplate({ children }: Props) {
       <div className="hidden lg:block w-[280px] bg-stone-400 dark:bg-stone-900 fixed inset-0">
         <SideBar />
       </div>
-      <div className="lg:pl-[280px] bg-stone-300 dark:bg-stone-800 min-h-dvh pb-12 lg:pb-0">
-        <div className="container mx-auto p-6 ">
-          <div className="bg-card rounded-xl p-6">{children}</div>
+      <div className="lg:pl-[280px] bg-stone-300 dark:bg-stone-800 min-h-dvh">
+        <div className="container mx-auto p-5 sm:p-6 ">
+          <div className="bg-card rounded-xl p-5 sm:p-6">{children}</div>
         </div>
       </div>
       <BottomBar />

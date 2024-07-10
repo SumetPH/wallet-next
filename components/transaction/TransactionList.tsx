@@ -6,7 +6,7 @@ import TransactionDeleteAlert from "./TransactionDeleteAlert";
 import TransactionFormDialog from "./TransactionFormDialog";
 import TransactionHeader from "./TransactionHeader";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { cn } from "@/lib/utils";
+import { amountColor, cn } from "@/lib/utils";
 import { EllipsisVertical } from "lucide-react";
 import type { TransactionRes } from "@/services/transaction/useTransactionList";
 import {
@@ -76,7 +76,7 @@ export default function TransactionList({
                   >
                     {({ openDialog }) => (
                       <div
-                        className="bg-background p-2 border-b last:border-none flex justify-between items-center cursor-pointer"
+                        className="bg-background p-2 border-b last:border-none flex gap-3 justify-between items-center cursor-pointer"
                         onClick={(e) => {
                           e.stopPropagation();
                           openDialog();
@@ -106,12 +106,16 @@ export default function TransactionList({
                               </span>
                             </AvatarFallback>
                           </Avatar>
-                          <div>
-                            <div className="flex gap-2 text-sm ">
-                              <section className="font-medium">
+                          <div className="text-xs sm:text-sm">
+                            <div className="flex flex-wrap">
+                              <section className="font-medium mr-2">
                                 {transaction.account_name}
                               </section>
-                              <section>{transaction.category_name}</section>
+                              <section className="font-bold">
+                                {transaction.transfer_type_id
+                                  ? transaction.transfer_type_name
+                                  : transaction.category_name}
+                              </section>
                             </div>
                             <div>
                               <section className="text-sm text-gray-500 dark:text-gray-400">
@@ -125,10 +129,8 @@ export default function TransactionList({
                         <div>
                           <section
                             className={cn(
-                              "font-medium text-lg",
-                              transaction.category_type_id === "1"
-                                ? "text-red-600"
-                                : "text-green-600"
+                              "font-medium text-base sm:text-lg",
+                              amountColor(transaction.transaction_amount)
                             )}
                           >
                             {numeral(transaction.transaction_amount).format(

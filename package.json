@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "db:pull": "kysely-codegen",
     "dev": "next dev -p 3010",
     "build": "next build",
     "start": "next start -p 3010",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:pull": "kysely-codegen",
+    "db:pull-dev": "DATABASE_URL=postgres://sumetph@localhost/wallet kysely-codegen"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

@@ -21,6 +21,8 @@ export interface Transaction {
   category_type_name: string;
   account_id: string;
   account_name: string;
+  transfer_type_id: string;
+  transfer_type_name: string;
 }
 
 type Props = {

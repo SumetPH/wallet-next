@@ -104,7 +104,7 @@ export default function AccountList({
                               </span>
                             </AvatarFallback>
                           </Avatar>
-                          <div>
+                          <div className="text-sm sm:text-base">
                             <section>{account.account_name}</section>
                             <section
                               className={cn(
