@@ -47,10 +47,7 @@ export default function AccountList({
             <span
               className={cn(
                 "font-medium",
-                amountColor(
-                  accountType.account_type_balance,
-                  accountType.account_type_id
-                )
+                amountColor(accountType.account_type_balance)
               )}
             >
               {numeral(accountType.account_type_balance).format("0,0.00")} บาท
@@ -110,10 +107,7 @@ export default function AccountList({
                           <section
                             className={cn(
                               "font-medium",
-                              amountColor(
-                                account.net_balance,
-                                account.account_type_id
-                              )
+                              amountColor(account.net_balance)
                             )}
                           >
                             {numeral(account.net_balance).format("0,0.00")} บาท

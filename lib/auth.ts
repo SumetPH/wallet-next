@@ -49,8 +49,8 @@ export const lucia = new Lucia(adapter, {
 });
 
 export const googleAuth = new Google(
-  process.env.AUTH_GOOGLE_ID!,
-  process.env.AUTH_GOOGLE_SECRET!,
+  process.env.AUTH_GOOGLE_CLIENT_ID!,
+  process.env.AUTH_GOOGLE_CLIENT_SECRET!,
   process.env.AUTH_GOOGLE_CALLBACK_URL!
 );
 
