@@ -12,7 +12,7 @@ export default function AccountPage() {
   return (
     <AccountList
       accountTypeList={accountList.data ?? []}
-      isLoading={accountList.isLoading}
+      isFetching={accountList.isFetching}
       onSuccess={() => accountList.refetch()}
     />
   );

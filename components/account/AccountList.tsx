@@ -20,13 +20,13 @@ import { useRouter } from "next/navigation";
 
 type Props = {
   accountTypeList: AccountType[];
-  isLoading: boolean;
+  isFetching: boolean;
   onSuccess: () => void;
 };
 
 export default function AccountList({
   accountTypeList,
-  isLoading,
+  isFetching,
   onSuccess,
 }: Props) {
   const router = useRouter();
@@ -36,93 +36,96 @@ export default function AccountList({
       <AccountHeader onSuccess={onSuccess} />
 
       <SkeletonLoading
-        isLoading={isLoading}
+        isLoading={isFetching}
         dataLength={accountTypeList.length}
       />
 
-      {accountTypeList.map((accountType) => (
-        <div key={accountType.account_type_id}>
-          <div className="flex justify-between gap-2 p-1 bg-gray-100 dark:bg-gray-800">
-            <span>{accountType.account_type_name}</span>
-            <span
-              className={cn(
-                "font-medium",
-                amountColor(accountType.account_type_balance)
-              )}
-            >
-              {numeral(accountType.account_type_balance).format("0,0.00")} บาท
-            </span>
-          </div>
+      {!isFetching &&
+        accountTypeList.length > 0 &&
+        accountTypeList.map((accountType) => (
+          <div key={accountType.account_type_id}>
+            <div className="flex justify-between gap-2 p-1 bg-gray-100 dark:bg-gray-800">
+              <span>{accountType.account_type_name}</span>
+              <span
+                className={cn(
+                  "font-medium",
+                  amountColor(accountType.account_type_balance)
+                )}
+              >
+                {numeral(accountType.account_type_balance).format("0,0.00")} บาท
+              </span>
+            </div>
 
-          {accountType.accounts.map((account) => (
-            <AccountFormDialog
-              key={account.account_id}
-              account={account}
-              mode="edit"
-              onSuccess={onSuccess}
-            >
-              {({ openDialog: openDialogEdit }) => (
-                <AccountDeleteAlert account={account} onSuccess={onSuccess}>
-                  {({ openAlert: openAlertDelete }) => (
-                    <div
-                      className="p-2 border-b last:border-none flex justify-between items-center cursor-pointer"
-                      onClick={() =>
-                        router.push(`/account/${account.account_id}`)
-                      }
-                    >
-                      <div className="flex gap-3 items-center">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger>
-                            <EllipsisVertical />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openDialogEdit();
-                              }}
-                            >
-                              แก้ไข
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openAlertDelete();
-                              }}
-                            >
-                              ลบ
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+            {accountType.accounts.map((account) => (
+              <AccountFormDialog
+                key={account.account_id}
+                account={account}
+                mode="edit"
+                onSuccess={onSuccess}
+              >
+                {({ openDialog: openDialogEdit }) => (
+                  <AccountDeleteAlert account={account} onSuccess={onSuccess}>
+                    {({ openAlert: openAlertDelete }) => (
+                      <div
+                        className="p-2 border-b last:border-none flex justify-between items-center cursor-pointer"
+                        onClick={() =>
+                          router.push(`/account/${account.account_id}`)
+                        }
+                      >
+                        <div className="flex gap-3 items-center">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger>
+                              <EllipsisVertical />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openDialogEdit();
+                                }}
+                              >
+                                แก้ไข
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openAlertDelete();
+                                }}
+                              >
+                                ลบ
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
 
-                        <Avatar>
-                          <AvatarFallback>
-                            <span className="text-xs">
-                              {account.account_name}
-                            </span>
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <section>{account.account_name}</section>
-                          <section
-                            className={cn(
-                              "font-medium",
-                              amountColor(account.net_balance)
-                            )}
-                          >
-                            {numeral(account.net_balance).format("0,0.00")} บาท
-                            <br />
-                          </section>
+                          <Avatar>
+                            <AvatarFallback>
+                              <span className="text-xs">
+                                {account.account_name}
+                              </span>
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <section>{account.account_name}</section>
+                            <section
+                              className={cn(
+                                "font-medium",
+                                amountColor(account.net_balance)
+                              )}
+                            >
+                              {numeral(account.net_balance).format("0,0.00")}{" "}
+                              บาท
+                              <br />
+                            </section>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </AccountDeleteAlert>
-              )}
-            </AccountFormDialog>
-          ))}
-        </div>
-      ))}
+                    )}
+                  </AccountDeleteAlert>
+                )}
+              </AccountFormDialog>
+            ))}
+          </div>
+        ))}
     </>
   );
 }

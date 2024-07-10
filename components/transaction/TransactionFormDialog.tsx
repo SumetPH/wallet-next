@@ -44,6 +44,7 @@ import useCategoryList, {
   CategoryType,
 } from "@/services/category/useCategoryList";
 import { toast } from "../ui/use-toast";
+import useLoadingStore from "@/stores/useLoading";
 
 type Props = {
   children: ({ openDialog }: { openDialog: () => void }) => React.ReactNode;
@@ -80,6 +81,7 @@ export default function TransactionFormDialog({
   onSuccess,
 }: Props) {
   const [dialog, setDialog] = useState(false);
+  const { setIsLoading } = useLoadingStore();
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -125,6 +127,7 @@ export default function TransactionFormDialog({
 
   const createTransaction = async (data: FormData) => {
     try {
+      setIsLoading(true);
       const res = await fetch("/api/v1/transaction-create", {
         method: "POST",
         body: JSON.stringify({
@@ -152,11 +155,14 @@ export default function TransactionFormDialog({
         title: "บันทึกไม่สําเร็จ",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const updateAccount = async (data: FormData) => {
     try {
+      setIsLoading(true);
       const res = await fetch("/api/v1/transaction-update", {
         method: "PUT",
         body: JSON.stringify({
@@ -184,6 +190,8 @@ export default function TransactionFormDialog({
         title: "บันทึกไม่สําเร็จ",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -246,7 +254,7 @@ export default function TransactionFormDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {accountList.isLoading && (
+                          {accountList.isFetching && (
                             <SelectItem value="loading" disabled>
                               กำลังโหลด...
                             </SelectItem>
@@ -295,7 +303,7 @@ export default function TransactionFormDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {categoryList.isLoading && (
+                          {categoryList.isFetching && (
                             <SelectItem value="loading" disabled>
                               กำลังโหลด...
                             </SelectItem>

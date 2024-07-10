@@ -161,7 +161,6 @@ export const CategoryFormModal = forwardRef<CategoryFormModalRef, Props>(
                         selectionMode="single"
                         selectedKeys={field.value}
                         onSelectionChange={field.onChange}
-                        // isLoading={accountTypeList.isLoading}
                         isInvalid={
                           form.formState.errors.categoryTypeId?.message
                             ? true

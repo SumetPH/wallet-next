@@ -15,8 +15,8 @@ export default function CategoryTransaction({
 
   return (
     <TransactionList
-      transactionRes={transactionList.data}
-      isLoading={transactionList.isLoading}
+      transactionRes={transactionList.data ?? []}
+      isFetching={transactionList.isFetching}
       onSuccess={() => {}}
     />
   );

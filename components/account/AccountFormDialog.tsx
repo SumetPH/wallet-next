@@ -37,6 +37,7 @@ import { cn } from "@/lib/utils";
 import { Calendar } from "../ui/calendar";
 import { TimePicker } from "../ui/time-picker/time-picker";
 import { toast } from "../ui/use-toast";
+import useLoadingStore from "@/stores/useLoading";
 
 type Props = {
   children: ({ openDialog }: { openDialog: () => void }) => React.ReactNode;
@@ -67,6 +68,7 @@ export default function AccountFormDialog({
   onSuccess,
 }: Props) {
   const [dialog, setDialog] = useState(false);
+  const { setIsLoading } = useLoadingStore();
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -100,6 +102,7 @@ export default function AccountFormDialog({
 
   const createAccount = async (data: FormData) => {
     try {
+      setIsLoading(true);
       const res = await fetch("/api/v1/account-create", {
         method: "POST",
         body: JSON.stringify({
@@ -126,11 +129,14 @@ export default function AccountFormDialog({
         title: "บันทึกไม่สําเร็จ",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const updateAccount = async (data: FormData) => {
     try {
+      setIsLoading(true);
       const res = await fetch("/api/v1/account-update", {
         method: "PUT",
         body: JSON.stringify({
@@ -157,6 +163,8 @@ export default function AccountFormDialog({
         title: "บันทึกไม่สําเร็จ",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -212,7 +220,7 @@ export default function AccountFormDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {accountTypeList.isLoading && (
+                          {accountTypeList.isFetching && (
                             <SelectItem value="loading" disabled>
                               กำลังโหลด...
                             </SelectItem>

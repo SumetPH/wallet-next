@@ -32,7 +32,7 @@ export default function CategoryPage() {
 
       <CategoryList
         categoryList={categoryList.data ?? []}
-        isLoading={categoryList.isLoading}
+        isFetching={categoryList.isFetching}
         onSuccess={categoryList.refetch}
       />
     </>

@@ -29,9 +29,9 @@ export default function AccountTransaction({
 
   return (
     <TransactionList
-      transactionRes={transactionList.data}
-      isLoading={transactionList.isLoading}
-      onSuccess={() => {}}
+      transactionRes={transactionList.data ?? []}
+      isFetching={transactionList.isFetching}
+      onSuccess={transactionList.refetch}
     />
   );
 }

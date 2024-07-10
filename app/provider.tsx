@@ -4,6 +4,7 @@ import React from "react";
 import ThemeProvider from "@/components/provider/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
 import ReactQueryProvider from "@/components/provider/ReactQueryProvider";
+import OverlayLoading from "@/components/OverlayLoading";
 
 type Props = {
   children: React.ReactNode;
@@ -18,6 +19,7 @@ export default function Provider({ children }: Props) {
         enableSystem
         disableTransitionOnChange
       >
+        <OverlayLoading />
         <Toaster />
         {children}
       </ThemeProvider>

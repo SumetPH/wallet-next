@@ -65,7 +65,7 @@ export default function BudgetPage() {
         </section>
       </div>
 
-      {!budgetList.isLoading &&
+      {!budgetList.isFetching &&
         budgetList.data?.budgetList.map((budget) => (
           <div
             key={budget.budget_id}

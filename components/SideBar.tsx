@@ -49,7 +49,7 @@ export default function Sidebar() {
     <div className="p-4 h-full flex flex-col justify-between">
       <div>
         <h1 className="text-white text-xl font-medium text-center my-4">
-          Money Wallet
+          Wallet Next
         </h1>
         <hr className="my-4" />
         <div className="flex flex-col gap-3">

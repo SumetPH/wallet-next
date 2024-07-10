@@ -18,14 +18,14 @@ import {
 import { CategoryType } from "@/services/category/useCategoryList";
 
 type Props = {
-  transactionRes?: TransactionRes[];
-  isLoading: boolean;
+  transactionRes: TransactionRes[];
+  isFetching: boolean;
   onSuccess: () => void;
 };
 
 export default function TransactionList({
   transactionRes,
-  isLoading,
+  isFetching,
   onSuccess,
 }: Props) {
   return (
@@ -33,115 +33,117 @@ export default function TransactionList({
       <TransactionHeader onSuccess={onSuccess} />
 
       <SkeletonLoading
-        isLoading={isLoading}
-        dataLength={transactionRes?.length}
+        isLoading={isFetching}
+        dataLength={transactionRes.length}
       />
 
-      {transactionRes?.map((item) => (
-        <div key={item.date}>
-          <div className="flex justify-between gap-2 p-1 bg-gray-100 dark:bg-gray-800 font-medium">
-            <span className="text-sm">{item.date}</span>
-            <div className="flex gap-3">
-              <span className="text-sm text-green-600">
-                {item.income !== "0"
-                  ? `+${numeral(item.income).format("0,0.00")}`
-                  : null}
-              </span>
-              <span className="text-sm text-red-600">
-                {item.expense !== "0"
-                  ? `-${numeral(item.expense).format("0,0.00")}`
-                  : null}
-              </span>
+      {!isFetching &&
+        transactionRes.length > 0 &&
+        transactionRes?.map((item) => (
+          <div key={item.date}>
+            <div className="flex justify-between gap-2 p-1 bg-gray-100 dark:bg-gray-800 font-medium">
+              <span className="text-sm">{item.date}</span>
+              <div className="flex gap-3">
+                <span className="text-sm text-green-600">
+                  {item.income !== "0"
+                    ? `+${numeral(item.income).format("0,0.00")}`
+                    : null}
+                </span>
+                <span className="text-sm text-red-600">
+                  {item.expense !== "0"
+                    ? `-${numeral(item.expense).format("0,0.00")}`
+                    : null}
+                </span>
+              </div>
             </div>
-          </div>
 
-          {item.transactions.map((transaction) => (
-            <TransactionDeleteAlert
-              key={transaction.transaction_id}
-              transaction={transaction}
-              onSuccess={onSuccess}
-            >
-              {({ openAlert: openAlertDelete }) => (
-                <TransactionFormDialog
-                  transaction={transaction}
-                  mode="edit"
-                  categoryType={
-                    transaction.category_type_id === "1"
-                      ? CategoryType.expense
-                      : CategoryType.income
-                  }
-                  onSuccess={onSuccess}
-                >
-                  {({ openDialog }) => (
-                    <div
-                      className="bg-background p-2 border-b last:border-none flex justify-between items-center cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openDialog();
-                      }}
-                    >
-                      <div className="flex gap-3 items-center">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger>
-                            <EllipsisVertical />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openAlertDelete();
-                              }}
-                            >
-                              ลบ
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+            {item.transactions.map((transaction) => (
+              <TransactionDeleteAlert
+                key={transaction.transaction_id}
+                transaction={transaction}
+                onSuccess={onSuccess}
+              >
+                {({ openAlert: openAlertDelete }) => (
+                  <TransactionFormDialog
+                    transaction={transaction}
+                    mode="edit"
+                    categoryType={
+                      transaction.category_type_id === "1"
+                        ? CategoryType.expense
+                        : CategoryType.income
+                    }
+                    onSuccess={onSuccess}
+                  >
+                    {({ openDialog }) => (
+                      <div
+                        className="bg-background p-2 border-b last:border-none flex justify-between items-center cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDialog();
+                        }}
+                      >
+                        <div className="flex gap-3 items-center">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger>
+                              <EllipsisVertical />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openAlertDelete();
+                                }}
+                              >
+                                ลบ
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
 
-                        <Avatar>
-                          <AvatarFallback>
-                            <span className="text-xs">
-                              {transaction.account_name}
-                            </span>
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="flex gap-2 text-sm ">
-                            <section className="font-medium">
-                              {transaction.account_name}
-                            </section>
-                            <section>{transaction.category_name}</section>
-                          </div>
+                          <Avatar>
+                            <AvatarFallback>
+                              <span className="text-xs">
+                                {transaction.account_name}
+                              </span>
+                            </AvatarFallback>
+                          </Avatar>
                           <div>
-                            <section className="text-sm text-gray-500 dark:text-gray-400">
-                              {dayjs(transaction.transaction_created_at).format(
-                                "HH:mm"
-                              )}
-                            </section>
+                            <div className="flex gap-2 text-sm ">
+                              <section className="font-medium">
+                                {transaction.account_name}
+                              </section>
+                              <section>{transaction.category_name}</section>
+                            </div>
+                            <div>
+                              <section className="text-sm text-gray-500 dark:text-gray-400">
+                                {dayjs(
+                                  transaction.transaction_created_at
+                                ).format("HH:mm")}
+                              </section>
+                            </div>
                           </div>
                         </div>
+                        <div>
+                          <section
+                            className={cn(
+                              "font-medium text-lg",
+                              transaction.category_type_id === "1"
+                                ? "text-red-600"
+                                : "text-green-600"
+                            )}
+                          >
+                            {numeral(transaction.transaction_amount).format(
+                              "0,0.00"
+                            )}
+                          </section>
+                        </div>
                       </div>
-                      <div>
-                        <section
-                          className={cn(
-                            "font-medium text-lg",
-                            transaction.category_type_id === "1"
-                              ? "text-red-600"
-                              : "text-green-600"
-                          )}
-                        >
-                          {numeral(transaction.transaction_amount).format(
-                            "0,0.00"
-                          )}
-                        </section>
-                      </div>
-                    </div>
-                  )}
-                </TransactionFormDialog>
-              )}
-            </TransactionDeleteAlert>
-          ))}
-        </div>
-      ))}
+                    )}
+                  </TransactionFormDialog>
+                )}
+              </TransactionDeleteAlert>
+            ))}
+          </div>
+        ))}
     </>
   );
 }
