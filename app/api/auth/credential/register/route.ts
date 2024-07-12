@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     const body = await schema.parseAsync(await req.json());
 
     const newUser = await db
-      .insertInto("wallet_user")
+      .insertInto("user")
       .values({
         id: uuid(),
         user_email: body.email,

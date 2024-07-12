@@ -13,16 +13,24 @@ export interface TransactionRes {
 export interface Transaction {
   transaction_id: string;
   transaction_amount: string;
-  transaction_note: string;
-  transaction_created_at: string;
-  category_id: string;
-  category_name: string;
-  category_type_id: string;
-  category_type_name: string;
-  account_id: string;
-  account_name: string;
-  transfer_type_id: string;
-  transfer_type_name: string;
+  transaction_note: string | null;
+  transaction_date: string;
+  transaction_type_id: string;
+  transaction_type_name: string;
+  category_id: string | null;
+  category_name: string | null;
+  category_type_id: string | null;
+  category_type_name: string | null;
+  account_id: string | null;
+  account_name: string | null;
+  transfer_id: string | null;
+  transfer_amount: string | null;
+  transfer_note: string | null;
+  transfer_date: string | null;
+  transfer_from_account_id: string | null;
+  transfer_from_account_name: string | null;
+  transfer_to_account_id: string | null;
+  transfer_to_account_name: string | null;
 }
 
 type Props = {

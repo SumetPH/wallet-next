@@ -16,10 +16,10 @@ export async function POST(req: NextRequest) {
     const body = await schema.parseAsync(await req.json());
 
     const existingUser = await db
-      .selectFrom("wallet_user")
+      .selectFrom("user")
       .selectAll()
-      .where("wallet_user.user_provider", "=", "credential")
-      .where("wallet_user.user_email", "=", body.email)
+      .where("user.user_provider", "=", "credential")
+      .where("user.user_email", "=", body.email)
       .executeTakeFirst();
 
     if (!existingUser) {

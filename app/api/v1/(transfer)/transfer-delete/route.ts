@@ -13,18 +13,26 @@ export async function DELETE(req: NextRequest) {
     }
 
     const schema = z.object({
-      transaction_id: z.string().min(1),
+      transfer_id: z.string().min(1),
     });
 
     const body = await schema.parseAsync(await req.json());
 
-    const deleteTransaction = await db
-      .deleteFrom("transaction")
-      .where("user_id", "=", session.user.id)
-      .where("transaction_id", "=", body.transaction_id)
-      .executeTakeFirstOrThrow();
+    const deleteTransfer = await db.transaction().execute(async (trx) => {
+      await trx
+        .deleteFrom("transfer")
+        .where("user_id", "=", session.user.id)
+        .where("transfer_id", "=", body.transfer_id)
+        .executeTakeFirstOrThrow();
 
-    return Response.json(deleteTransaction);
+      return await trx
+        .deleteFrom("transaction")
+        .where("user_id", "=", session.user.id)
+        .where("transfer_id", "=", body.transfer_id)
+        .executeTakeFirstOrThrow();
+    });
+
+    return Response.json(deleteTransfer);
   } catch (error) {
     console.error(error);
     return Response.json(error, { status: 500 });

@@ -12,20 +12,12 @@ export type Category = {
   total: string;
 };
 
-export enum CategoryType {
-  expense = "1",
-  income = "2",
-}
-
 type Props = {
   enable: boolean;
-  categoryType: CategoryType;
+  categoryType: string;
 };
 
-export default function useCategoryList({
-  enable = true,
-  categoryType = CategoryType.expense,
-}: Props) {
+export default function useCategoryList({ enable, categoryType }: Props) {
   const searchParams = new URLSearchParams();
   if (categoryType) searchParams.append("category_type_id", categoryType);
   const query = searchParams.toString() ? `?${searchParams.toString()}` : "";

@@ -24,25 +24,24 @@ export async function GET(req: NextRequest) {
     });
 
     const category = await db
-      .selectFrom("wallet_category")
-      .where("wallet_category.user_id", "=", session.user.id)
-      .where("wallet_category.category_type_id", "=", query.category_type_id)
+      .selectFrom("category")
+      .where("category.user_id", "=", session.user.id)
+      .where("category.category_type_id", "=", query.category_type_id)
       .leftJoin(
         "transactions",
         "transactions.category_id",
-        "wallet_category.category_id"
+        "category.category_id"
       )
-      .groupBy("wallet_category.category_id")
+      .groupBy("category.category_id")
       .select([
-        "wallet_category.category_type_id",
-        "wallet_category.user_id",
-        "wallet_category.category_created_at",
-        "wallet_category.category_id",
-        "wallet_category.category_name",
-        "wallet_category.category_updated_at",
-        sql<string>`sum(coalesce(transaction_amount, 0))`.as("total"),
+        "category.category_type_id",
+        "category.user_id",
+        "category.category_date",
+        "category.category_id",
+        "category.category_name",
+        sql<string>`sum(coalesce(transaction_amount, 0.00))`.as("total"),
       ])
-      .orderBy("wallet_category.category_name")
+      .orderBy("category.category_name")
       .execute();
 
     return Response.json(category);

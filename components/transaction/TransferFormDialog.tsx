@@ -40,42 +40,32 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import useCategoryList from "@/services/category/useCategoryList";
 import { toast } from "../ui/use-toast";
 import useLoadingStore from "@/stores/useLoading";
-import { TransactionType } from "@/services/transactionType/useTransactionType";
 
 type Props = {
   children: ({ openDialog }: { openDialog: () => void }) => React.ReactNode;
   mode: "create" | "edit";
   transaction?: Transaction;
-  transactionType: string;
-  categoryType: string;
   onSuccess?: () => void;
 };
 
 const schema = z.object({
-  transactionAmount: z
+  transferAmount: z
     .string({ required_error: "กรุณากรอกจํานวนเงิน" })
     .min(1, { message: "กรุณากรอกจํานวนเงิน" }),
-  accountId: z
-    .string({ required_error: "กรุณาเลือกบัญชี" })
-    .min(1, { message: "กรุณาเลือกบัญชี" }),
-  categoryId: z
-    .string({ required_error: "กรุณาเลือกหมวดหมู่" })
-    .min(1, { message: "กรุณาเลือกหมวดหมู่" }),
-  transactionNote: z.string().optional(),
-  createdAt: z.date({ required_error: "กรุณาเลือกวันที่" }),
+  transferNote: z.string().optional(),
+  transferDate: z.date({ required_error: "กรุณาเลือกวันที่" }),
+  transferFromAccountId: z.string({ required_error: "กรุณาเลือกบัญชีต้นทาง" }),
+  transferToAccountId: z.string({ required_error: "กรุณาเลือกบัญชีปลายทาง" }),
 });
 
 type FormData = z.infer<typeof schema>;
 
-export default function TransactionFormDialog({
+export default function TransferFormDialog({
   children,
   mode,
   transaction,
-  categoryType,
-  transactionType,
   onSuccess,
 }: Props) {
   const [dialog, setDialog] = useState(false);
@@ -83,11 +73,11 @@ export default function TransactionFormDialog({
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      transactionAmount: "",
-      accountId: "",
-      categoryId: "",
-      transactionNote: "",
-      createdAt: dayjs().toDate(),
+      transferAmount: "",
+      transferNote: "",
+      transferDate: dayjs().toDate(),
+      transferFromAccountId: "",
+      transferToAccountId: "",
     },
   });
 
@@ -95,49 +85,48 @@ export default function TransactionFormDialog({
     enable: dialog,
   });
 
-  const categoryList = useCategoryList({
-    enable: dialog,
-    categoryType: categoryType,
-  });
-
   const openDialog = () => {
     setDialog(true);
 
     if (transaction && mode === "edit") {
       form.setValue(
-        "transactionAmount",
-        transaction.transaction_amount.replace("-", "")
+        "transferAmount",
+        transaction.transfer_amount
+          ? transaction.transfer_amount.replace("-", "")
+          : ""
       );
-      form.setValue("accountId", transaction.account_id ?? "");
-      form.setValue("categoryId", transaction.category_id ?? "");
-      form.setValue("transactionNote", transaction.transaction_note ?? "");
-      form.setValue("createdAt", dayjs(transaction.transaction_date).toDate());
+      form.setValue("transferNote", transaction.transfer_note ?? "");
+      form.setValue("transferDate", dayjs(transaction.transfer_date).toDate());
+      form.setValue(
+        "transferFromAccountId",
+        transaction.transfer_from_account_id ?? ""
+      );
+      form.setValue(
+        "transferToAccountId",
+        transaction.transfer_to_account_id ?? ""
+      );
     }
   };
 
   const submit = (data: FormData) => {
     if (mode === "create") {
-      createTransaction(data);
+      createTransfer(data);
     } else {
-      updateTransaction(data);
+      updateTransfer(data);
     }
   };
 
-  const createTransaction = async (data: FormData) => {
+  const createTransfer = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const res = await fetch("/api/v1/transaction-create", {
+      const res = await fetch("/api/v1/transfer-create", {
         method: "POST",
         body: JSON.stringify({
-          transaction_amount:
-            transactionType === TransactionType.expense
-              ? `-${data.transactionAmount}`
-              : data.transactionAmount,
-          transaction_note: data.transactionNote,
-          transaction_date: dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss"),
-          transaction_type_id: transactionType,
-          account_id: data.accountId,
-          category_id: data.categoryId,
+          transfer_amount: data.transferAmount,
+          transfer_note: data.transferNote,
+          transfer_date: dayjs(data.transferDate).format("YYYY-MM-DD HH:mm:ss"),
+          transfer_from_account_id: data.transferFromAccountId,
+          transfer_to_account_id: data.transferToAccountId,
         }),
       });
 
@@ -160,23 +149,18 @@ export default function TransactionFormDialog({
     }
   };
 
-  const updateTransaction = async (data: FormData) => {
+  const updateTransfer = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const res = await fetch("/api/v1/transaction-update", {
+      const res = await fetch("/api/v1/transfer-update", {
         method: "PUT",
         body: JSON.stringify({
-          transaction_id: transaction?.transaction_id,
-
-          transaction_amount:
-            transactionType === TransactionType.expense
-              ? `-${data.transactionAmount}`
-              : data.transactionAmount,
-          transaction_note: data.transactionNote,
-          transaction_date: dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss"),
-          transaction_type_id: transaction?.transaction_type_id,
-          account_id: data.accountId,
-          category_id: data.categoryId,
+          transfer_id: transaction?.transfer_id,
+          transfer_amount: data.transferAmount,
+          transfer_note: data.transferNote,
+          transfer_date: dayjs(data.transferDate).format("YYYY-MM-DD HH:mm:ss"),
+          transfer_from_account_id: data.transferFromAccountId,
+          transfer_to_account_id: data.transferToAccountId,
         }),
       });
       if (res.status === 200) {
@@ -211,19 +195,13 @@ export default function TransactionFormDialog({
           <Form {...form}>
             <form onSubmit={form.handleSubmit(submit)}>
               <DialogHeader>
-                <DialogTitle className="mb-4">
-                  {transactionType === TransactionType.expense ? (
-                    <span className="text-red-600">รายจ่าย</span>
-                  ) : (
-                    <span className="text-green-600">รายรับ</span>
-                  )}
-                </DialogTitle>
+                <DialogTitle className="mb-4">โอนเงิน</DialogTitle>
                 <DialogDescription></DialogDescription>
               </DialogHeader>
               <div>
                 <FormField
                   control={form.control}
-                  name="transactionAmount"
+                  name="transferAmount"
                   render={({ field }) => (
                     <FormItem className="mb-4">
                       <FormLabel>จํานวน</FormLabel>
@@ -246,10 +224,10 @@ export default function TransactionFormDialog({
 
                 <FormField
                   control={form.control}
-                  name="accountId"
+                  name="transferFromAccountId"
                   render={({ field }) => (
                     <FormItem className="mb-4">
-                      <FormLabel>บัญชี</FormLabel>
+                      <FormLabel>บัญชีต้นทาง</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -279,6 +257,62 @@ export default function TransactionFormDialog({
                                 <SelectItem
                                   key={account.account_id}
                                   value={account.account_id}
+                                  disabled={
+                                    account.account_id ===
+                                    form.getValues().transferToAccountId
+                                  }
+                                >
+                                  {account.account_name}
+                                </SelectItem>
+                              ))}
+                              <SelectSeparator />
+                            </SelectGroup>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="transferToAccountId"
+                  render={({ field }) => (
+                    <FormItem className="mb-4">
+                      <FormLabel>บัญชีปลายทาง</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="เลือกบัญชี" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {accountList.isFetching && (
+                            <SelectItem value="loading" disabled>
+                              กำลังโหลด...
+                            </SelectItem>
+                          )}
+                          {accountList.data?.length === 0 && (
+                            <SelectItem value="empty" disabled>
+                              ไม่พบหมวดหมู่
+                            </SelectItem>
+                          )}
+                          {accountList.data?.map((accountType) => (
+                            <SelectGroup key={accountType.account_type_id}>
+                              <SelectLabel>
+                                {accountType.account_type_name}
+                              </SelectLabel>
+                              {accountType.accounts.map((account) => (
+                                <SelectItem
+                                  key={account.account_id}
+                                  value={account.account_id}
+                                  disabled={
+                                    account.account_id ===
+                                    form.getValues().transferFromAccountId
+                                  }
                                 >
                                   {account.account_name}
                                 </SelectItem>
@@ -295,48 +329,7 @@ export default function TransactionFormDialog({
 
                 <FormField
                   control={form.control}
-                  name="categoryId"
-                  render={({ field }) => (
-                    <FormItem className="mb-4">
-                      <FormLabel>หมวดหมู่</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="เลือกหมวดหมู่" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {categoryList.isFetching && (
-                            <SelectItem value="loading" disabled>
-                              กำลังโหลด...
-                            </SelectItem>
-                          )}
-                          {categoryList.data?.length === 0 && (
-                            <SelectItem value="empty" disabled>
-                              ไม่พบหมวดหมู่
-                            </SelectItem>
-                          )}
-                          {categoryList.data?.map((category) => (
-                            <SelectItem
-                              key={category.category_id}
-                              value={category.category_id}
-                            >
-                              {category.category_name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="createdAt"
+                  name="transferDate"
                   render={({ field }) => (
                     <FormItem className="mb-4 flex flex-col">
                       <FormLabel className="text-left">วันที่</FormLabel>

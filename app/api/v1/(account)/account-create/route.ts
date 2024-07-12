@@ -17,24 +17,24 @@ export async function POST(req: NextRequest) {
       account_name: z.string().min(1),
       account_type_id: z.string().min(1),
       account_balance: z.string().min(1),
-      account_start_date: z.string().min(1),
+      account_date: z.string().min(1),
     });
 
     const body = await bodySchema.parseAsync(await req.json());
 
-    const newAccount = await db
-      .insertInto("wallet_account")
+    const createAccount = await db
+      .insertInto("account")
       .values({
+        user_id: session.user.id,
         account_id: uuid(),
         account_name: body.account_name,
         account_type_id: body.account_type_id,
-        user_id: session.user.id,
         account_balance: body.account_balance,
-        account_created_at: body.account_start_date,
+        account_date: body.account_date,
       })
       .executeTakeFirstOrThrow();
 
-    return Response.json(newAccount);
+    return Response.json(createAccount);
   } catch (error) {
     console.error(error);
     return Response.json(error, { status: 500 });

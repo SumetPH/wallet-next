@@ -1,13 +1,10 @@
 "use client";
 
-import SkeletonLoading from "@/components/SkeletonLoading";
 import CategoryHeader from "@/components/category/CategoryHeader";
 import CategoryList from "@/components/category/CategoryList";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import useCategoryList, {
-  CategoryType,
-} from "@/services/category/useCategoryList";
-// import { Tabs, Tab } from "@nextui-org/react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import useCategoryList from "@/services/category/useCategoryList";
+import { CategoryType } from "@/services/categoryType/useCategoryType";
 import React, { useState } from "react";
 
 export default function CategoryPage() {

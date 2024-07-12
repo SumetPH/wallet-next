@@ -7,8 +7,6 @@ export type AccountList = AccountType[];
 export interface AccountType {
   account_type_id: string;
   account_type_name: string;
-  account_type_created_at: string;
-  account_type_updated_at: string;
   account_type_balance: string;
   accounts: Account[];
 }

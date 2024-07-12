@@ -19,7 +19,7 @@ export async function DELETE(req: NextRequest) {
     const body = await schema.parseAsync(await req.json());
 
     const deleteCategory = await db
-      .deleteFrom("wallet_category")
+      .deleteFrom("category")
       .where("category_id", "=", body.category_id)
       .where("user_id", "=", session.user.id)
       .executeTakeFirstOrThrow();

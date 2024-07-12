@@ -17,18 +17,20 @@ export async function DELETE(req: NextRequest) {
     });
     const body = await bodySchema.parseAsync(await req.json());
 
-    await db
-      .deleteFrom("wallet_transaction")
-      .where("account_id", "=", body.account_id)
-      .execute();
+    const deleteAccount = await db.transaction().execute(async (trx) => {
+      await trx
+        .deleteFrom("transaction")
+        .where("account_id", "=", body.account_id)
+        .execute();
 
-    await db
-      .deleteFrom("wallet_account")
-      .where("account_id", "=", body.account_id)
-      .where("user_id", "=", session.user.id)
-      .executeTakeFirstOrThrow();
+      return await trx
+        .deleteFrom("account")
+        .where("account_id", "=", body.account_id)
+        .where("user_id", "=", session.user.id)
+        .executeTakeFirstOrThrow();
+    });
 
-    return Response.json({ message: "deleted successfully" });
+    return Response.json(deleteAccount);
   } catch (error) {
     console.error(error);
     return Response.json(error, { status: 500 });

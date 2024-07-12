@@ -13,8 +13,8 @@ export async function DELETE(req: NextRequest) {
     const body = await schema.parseAsync(await req.json());
 
     await db
-      .deleteFrom("wallet_budget")
-      .where("wallet_budget.budget_id", "=", body.budget_id)
+      .deleteFrom("budget")
+      .where("budget.budget_id", "=", body.budget_id)
       .executeTakeFirstOrThrow();
 
     return Response.json({ message: "deleted successfully" });

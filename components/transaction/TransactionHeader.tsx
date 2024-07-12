@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import TransactionFormDialog from "./TransactionFormDialog";
-import { CategoryType } from "@/services/category/useCategoryList";
+import { CategoryType } from "@/services/categoryType/useCategoryType";
 import { Ellipsis } from "lucide-react";
 import {
   DropdownMenu,
@@ -8,12 +8,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { TransactionType } from "@/services/transactionType/useTransactionType";
 
 type Props = {
   onSuccess: () => void;
 };
 
 export default function TransactionHeader({ onSuccess }: Props) {
+  const [transactionType, setTransactionType] = useState(
+    TransactionType.expense
+  );
   const [categoryType, setCategoryType] = useState(CategoryType.expense);
 
   return (
@@ -23,6 +27,7 @@ export default function TransactionHeader({ onSuccess }: Props) {
         <section>
           <TransactionFormDialog
             mode="create"
+            transactionType={transactionType}
             categoryType={categoryType}
             onSuccess={onSuccess}
           >
@@ -34,6 +39,7 @@ export default function TransactionHeader({ onSuccess }: Props) {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
                     onClick={() => {
+                      setTransactionType(TransactionType.expense);
                       setCategoryType(CategoryType.expense);
                       openDialog();
                     }}
@@ -42,6 +48,7 @@ export default function TransactionHeader({ onSuccess }: Props) {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => {
+                      setTransactionType(TransactionType.income);
                       setCategoryType(CategoryType.income);
                       openDialog();
                     }}

@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     const googleUser: GoogleUser = await googleUserResponse.json();
 
     const existingUser = await db
-      .selectFrom("wallet_user")
+      .selectFrom("user")
       .where("user_email", "=", googleUser.email)
       .selectAll()
       .executeTakeFirst();
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
     } else {
       const userId = uuid();
       await db
-        .insertInto("wallet_user")
+        .insertInto("user")
         .values({
           id: userId,
           user_email: googleUser.email,

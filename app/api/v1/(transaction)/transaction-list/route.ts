@@ -29,49 +29,53 @@ export async function GET(req: NextRequest) {
     });
 
     let querySql = db
-      .selectFrom("transactions")
-      .where("transactions.user_id", "=", session.user.id)
+      .selectFrom("transactions as t")
+      .where("t.user_id", "=", session.user.id)
       .select([
-        sql<string>`to_char(date(transaction_created_at), 'YYYY-MM-DD')`.as(
-          "date"
-        ),
+        sql<string>`to_char(date(transaction_date), 'YYYY-MM-DD')`.as("date"),
         sql<string>`sum(
-          case 
-            when category_type_id = '1' then transaction_amount 
-            when transfer_type_id = '1' then transaction_amount 
-            else 0 
-          end)`.as("expense"),
+          case
+            when transaction_type_id = '1' then transaction_amount
+            else 0
+          end
+        )`.as("expense"),
         sql<string>`sum(
-          case 
-            when category_type_id = '2' then transaction_amount 
-            when transfer_type_id = '2' then transaction_amount 
-            else 0 
-          end)`.as("income"),
-        sql<string>`
-              coalesce(sum(case when category_type_id = '2' then transaction_amount else 0 end), 0) - 
-              coalesce(sum(case when category_type_id = '1' then transaction_amount else 0 end), 0)
-            `.as("total"),
+          case
+            when transaction_type_id = '2' then transaction_amount
+            else 0
+          end
+        )`.as("income"),
+        sql<string>`sum(
+          case
+            when transaction_type_id = '1' then transaction_amount
+            when transaction_type_id = '2' then transaction_amount
+            else 0
+          end
+        )`.as("total"),
         sql<{ transaction_amount: string }[]>`
               JSON_AGG(
                 JSON_BUILD_OBJECT(
-                    'transaction_id', transaction_id,
-                    'transaction_amount', 
-                      case 
-                        when category_type_id = '1' then '-' || transaction_amount::text 
-                        when transfer_type_id = '1' then '-' || transaction_amount::text 
-                        else transaction_amount::text 
-                      end,
-                    'transaction_note', transaction_note,
-                    'transaction_created_at', to_char(transaction_created_at, 'YYYY-MM-DD HH24:MI:SS'),
-                    'category_id', category_id,
-                    'category_name', category_name,
-                    'category_type_id', category_type_id,
-                    'category_type_name', category_type_name,
-                    'account_id', account_id,
-                    'account_name', account_name,
-                    'transfer_type_id', transfer_type_id,
-                    'transfer_type_name', transfer_type_name
-                ) order by transaction_created_at desc
+                    'transaction_id', t.transaction_id,
+                    'transaction_amount', t.transaction_amount::text,
+                    'transaction_note', t.transaction_note,
+                    'transaction_date', to_char(t.transaction_date, 'YYYY-MM-DD HH24:MI:SS'),
+                    'transaction_type_id', t.transaction_type_id,
+                    'transaction_type_name', t.transaction_type_name,
+                    'category_id', t.category_id,
+                    'category_name', t.category_name,
+                    'category_type_id', t.category_type_id,
+                    'category_type_name', t.category_type_name,
+                    'account_id', t.account_id,
+                    'account_name', t.account_name,
+                    'transfer_id', t.transfer_id,
+                    'transfer_amount', t.transfer_amount::text,
+                    'transfer_note', t.transfer_note,
+                    'transfer_date', to_char(t.transfer_date, 'YYYY-MM-DD HH24:MI:SS'),
+                    'transfer_from_account_id', t.transfer_from_account_id,
+                    'transfer_from_account_name', (select account_name from account where account_id = t.transfer_from_account_id),
+                    'transfer_to_account_id', t.transfer_to_account_id,
+                    'transfer_to_account_name', (select account_name from account where account_id = t.transfer_to_account_id)
+                ) order by t.transaction_date desc
               )
             `.as("transactions"),
       ])
@@ -85,14 +89,14 @@ export async function GET(req: NextRequest) {
     }
     if (query.start_date) {
       querySql = querySql.where(
-        "transaction_created_at",
+        "transaction_date",
         ">=",
         new Date(query.start_date)
       );
     }
     if (query.end_date) {
       querySql = querySql.where(
-        "transaction_created_at",
+        "transaction_date",
         "<=",
         new Date(query.end_date)
       );

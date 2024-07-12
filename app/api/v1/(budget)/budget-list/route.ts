@@ -15,13 +15,13 @@ export async function GET() {
     const budget = await db
       .with("budget_all", (db) =>
         db
-          .selectFrom("wallet_budget")
-          .where("wallet_budget.user_id", "=", session.user.id)
-          .groupBy(["wallet_budget.category_id", "wallet_budget.user_id"])
+          .selectFrom("budget")
+          .where("budget.user_id", "=", session.user.id)
+          .groupBy(["budget.category_id", "budget.user_id"])
           .select(({ fn }) => [
-            "wallet_budget.user_id",
-            "wallet_budget.category_id",
-            fn.sum("wallet_budget.budget_amount").as("budget_total"),
+            "budget.user_id",
+            "budget.category_id",
+            fn.sum("budget.budget_amount").as("budget_total"),
           ])
       )
       .with("budget_spend", (db) =>
@@ -30,12 +30,12 @@ export async function GET() {
           .where("transactions.category_type_id", "=", "1")
           .where("transactions.user_id", "=", session.user.id)
           .where(
-            "transaction_created_at",
+            "transaction_date",
             ">=",
             dayjs().startOf("month").hour(0).minute(0).second(0).toDate()
           )
           .where(
-            "transaction_created_at",
+            "transaction_date",
             "<=",
             dayjs().endOf("month").hour(23).minute(59).second(59).toDate()
           )
@@ -63,33 +63,33 @@ export async function GET() {
       .executeTakeFirst();
 
     const budgetList = await db
-      .selectFrom("wallet_budget")
+      .selectFrom("budget")
       .leftJoin("transactions", (join) =>
         join
-          .onRef("transactions.category_id", "=", "wallet_budget.category_id")
+          .onRef("transactions.category_id", "=", "budget.category_id")
           .on(
-            "transactions.transaction_created_at",
+            "transactions.transaction_date",
             ">=",
             dayjs().startOf("month").hour(0).minute(0).second(0).toDate()
           )
           .on(
-            "transactions.transaction_created_at",
+            "transactions.transaction_date",
             "<=",
             dayjs().endOf("month").hour(23).minute(59).second(59).toDate()
           )
       )
-      .where("wallet_budget.user_id", "=", session.user.id)
-      .groupBy("wallet_budget.budget_id")
-      .orderBy("wallet_budget.budget_name")
+      .where("budget.user_id", "=", session.user.id)
+      .groupBy("budget.budget_id")
+      .orderBy("budget.budget_name")
       .select(({ fn }) => [
-        "wallet_budget.budget_id",
-        "wallet_budget.budget_name",
-        "wallet_budget.budget_amount",
+        "budget.budget_id",
+        "budget.budget_name",
+        "budget.budget_amount",
         fn.sum("transactions.transaction_amount").as("expense"),
-        sql<string>`wallet_budget.budget_amount - sum(transactions.transaction_amount)`.as(
+        sql<string>`budget.budget_amount - sum(transactions.transaction_amount)`.as(
           "remain"
         ),
-        "wallet_budget.category_id",
+        "budget.category_id",
       ])
       .execute();
 

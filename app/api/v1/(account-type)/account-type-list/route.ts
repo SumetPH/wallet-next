@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const accountTypes = await db
-      .selectFrom("wallet_account_type")
+      .selectFrom("account_type")
       .selectAll()
       .orderBy("account_type_id asc")
       .execute();

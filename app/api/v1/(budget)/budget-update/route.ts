@@ -18,8 +18,8 @@ export async function PUT(req: NextRequest) {
     const body = await schema.parseAsync(await req.json());
 
     await db
-      .updateTable("wallet_budget")
-      .where("wallet_budget.budget_id", "=", body.budget_id)
+      .updateTable("budget")
+      .where("budget.budget_id", "=", body.budget_id)
       .set({
         budget_amount: body.budget_amount,
         budget_name: body.budget_name,

@@ -26,7 +26,7 @@ export const adapter = new NodePostgresAdapter(
     connectionString: process.env.DATABASE_URL,
   }),
   {
-    user: "wallet_user",
+    user: "user",
     session: "user_session",
   }
 );
