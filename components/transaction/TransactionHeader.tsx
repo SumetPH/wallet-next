@@ -9,6 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { TransactionType } from "@/services/transactionType/useTransactionType";
+import TransferFormDialog from "./TransferFormDialog";
+import DebtPaymentFormDialog from "./DebtPaymentFormDialog";
 
 type Props = {
   onSuccess: () => void;
@@ -31,32 +33,54 @@ export default function TransactionHeader({ onSuccess }: Props) {
             categoryType={categoryType}
             onSuccess={onSuccess}
           >
-            {({ openDialog }) => (
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Ellipsis />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setTransactionType(TransactionType.expense);
-                      setCategoryType(CategoryType.expense);
-                      openDialog();
-                    }}
-                  >
-                    เพิ่มรายจ่าย
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setTransactionType(TransactionType.income);
-                      setCategoryType(CategoryType.income);
-                      openDialog();
-                    }}
-                  >
-                    เพิ่มรายรับ
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            {({ openDialog: openDialogTransaction }) => (
+              <TransferFormDialog mode="create" onSuccess={onSuccess}>
+                {({ openDialog: openDialogTransfer }) => (
+                  <DebtPaymentFormDialog mode="create" onSuccess={onSuccess}>
+                    {({ openDialog: openDialogDebtPayment }) => (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Ellipsis />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setTransactionType(TransactionType.expense);
+                              setCategoryType(CategoryType.expense);
+                              openDialogTransaction();
+                            }}
+                          >
+                            เพิ่มรายจ่าย
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setTransactionType(TransactionType.income);
+                              setCategoryType(CategoryType.income);
+                              openDialogTransaction();
+                            }}
+                          >
+                            เพิ่มรายรับ
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              openDialogTransfer();
+                            }}
+                          >
+                            โอน
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              openDialogDebtPayment();
+                            }}
+                          >
+                            ชําระหนี้
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </DebtPaymentFormDialog>
+                )}
+              </TransferFormDialog>
             )}
           </TransactionFormDialog>
         </section>

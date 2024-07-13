@@ -3,8 +3,8 @@
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { House, Notebook, LogOut, PieChart, Layers } from "lucide-react";
-import clsx from "clsx";
 import { toast } from "./ui/use-toast";
+import { cn } from "@/lib/utils";
 
 export default function BottomBar() {
   const router = useRouter();
@@ -52,25 +52,25 @@ export default function BottomBar() {
             className="flex justify-center items-center"
             onClick={() => router.push("/transaction")}
           >
-            <House className={clsx(activeMenu("/transaction"))} size={20} />
+            <House className={cn(activeMenu("/transaction"))} size={20} />
           </button>
           <button
             className="flex justify-center items-center"
             onClick={() => router.push("/account")}
           >
-            <Notebook className={clsx(activeMenu("/account"))} size={20} />
+            <Notebook className={cn(activeMenu("/account"))} size={20} />
           </button>
           <button
             className="flex justify-center items-center"
             onClick={() => router.push("/category")}
           >
-            <Layers className={clsx(activeMenu("/category"))} size={20} />
+            <Layers className={cn(activeMenu("/category"))} size={20} />
           </button>
           <button
             className="flex justify-center items-center"
             onClick={() => router.push("/budget")}
           >
-            <PieChart className={clsx(activeMenu("/budget"))} size={20} />
+            <PieChart className={cn(activeMenu("/budget"))} size={20} />
           </button>
           <button className="flex justify-center items-center" onClick={logout}>
             <LogOut className="text-stone-600" size={20} />

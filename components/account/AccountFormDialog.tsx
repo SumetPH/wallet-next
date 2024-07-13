@@ -109,9 +109,7 @@ export default function AccountFormDialog({
           account_name: data.accountName,
           account_type_id: data.accountTypeId,
           account_balance: data.balance,
-          account_start_date: dayjs(data.createdAt).format(
-            "YYYY-MM-DD HH:mm:ss"
-          ),
+          account_date: dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss"),
         }),
       });
 
@@ -144,9 +142,7 @@ export default function AccountFormDialog({
           account_name: data.accountName,
           account_type_id: data.accountTypeId,
           account_balance: data.balance,
-          account_start_date: dayjs(data.createdAt).format(
-            "YYYY-MM-DD HH:mm:ss"
-          ),
+          account_date: dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss"),
         }),
       });
       if (res.status === 200) {
@@ -271,17 +267,17 @@ export default function AccountFormDialog({
                   control={form.control}
                   name="createdAt"
                   render={({ field }) => (
-                    <FormItem className="mb-4 flex flex-col">
+                    <FormItem className="mb-4 ">
                       <FormLabel className="text-left">วันที่</FormLabel>
                       <Popover>
                         <FormControl>
                           <PopoverTrigger asChild data-testid="date-picker">
                             <Button
-                              variant="outline"
                               className={cn(
-                                "justify-start text-left font-normal",
+                                "flex justify-start font-normal w-full",
                                 !field.value && "text-muted-foreground"
                               )}
+                              variant="outline"
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
                               {field.value ? (

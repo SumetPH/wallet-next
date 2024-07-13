@@ -17,6 +17,7 @@ import {
 } from "../ui/dropdown-menu";
 import { CategoryType } from "@/services/categoryType/useCategoryType";
 import TransferFormDialog from "./TransferFormDialog";
+import DebtPaymentFormDialog from "./DebtPaymentFormDialog";
 
 type Props = {
   transactionRes: TransactionRes[];
@@ -69,12 +70,12 @@ export default function TransactionList({
                     mode="edit"
                     transaction={transaction}
                     transactionType={transaction.transaction_type_id}
+                    onSuccess={onSuccess}
                     categoryType={
                       transaction.category_type_id === "1"
                         ? CategoryType.expense
                         : CategoryType.income
                     }
-                    onSuccess={onSuccess}
                   >
                     {({ openDialog: openDialogTransaction }) => (
                       <TransferFormDialog
@@ -83,72 +84,84 @@ export default function TransactionList({
                         onSuccess={onSuccess}
                       >
                         {({ openDialog: openDialogTransfer }) => (
-                          <div
-                            className="bg-background p-2 border-b last:border-none flex gap-3 justify-between items-center cursor-pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (transaction.transfer_id) {
-                                openDialogTransfer();
-                              } else {
-                                openDialogTransaction();
-                              }
-                            }}
+                          <DebtPaymentFormDialog
+                            mode="edit"
+                            transaction={transaction}
+                            onSuccess={onSuccess}
                           >
-                            <div className="flex gap-3 items-center">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger>
-                                  <EllipsisVertical />
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuItem
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      openAlertDelete();
-                                    }}
-                                  >
-                                    ลบ
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                            {({ openDialog: openDialogDebtPayment }) => (
+                              <div
+                                className="bg-background p-2 border-b last:border-none flex gap-3 justify-between items-center cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (transaction.transfer_id) {
+                                    openDialogTransfer();
+                                  } else if (transaction.debt_payment_id) {
+                                    openDialogDebtPayment();
+                                  } else {
+                                    openDialogTransaction();
+                                  }
+                                }}
+                              >
+                                <div className="flex gap-3 items-center">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger>
+                                      <EllipsisVertical />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                      <DropdownMenuItem
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          openAlertDelete();
+                                        }}
+                                      >
+                                        ลบ
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
 
-                              <Avatar>
-                                <AvatarFallback>
-                                  <span className="text-xs">
-                                    {transaction.transaction_type_name}
-                                  </span>
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="text-xs sm:text-sm">
-                                <div className="flex flex-wrap gap-2">
-                                  <section className="font-medium">
-                                    {transaction.account_name}
-                                  </section>
-                                  <section className="font-bold">
-                                    {transaction.transaction_type_name}
-                                  </section>
+                                  <Avatar>
+                                    <AvatarFallback>
+                                      <span className="text-xs">
+                                        {transaction.transaction_type_name}
+                                      </span>
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div className="text-xs sm:text-sm">
+                                    <div className="flex flex-wrap gap-2">
+                                      <section className="font-medium">
+                                        {transaction.account_name}
+                                      </section>
+                                      <section className="font-bold">
+                                        {transaction.transaction_type_name}
+                                      </section>
+                                    </div>
+                                    <div>
+                                      <section className="text-sm text-gray-500 dark:text-gray-400">
+                                        {dayjs(
+                                          transaction.transaction_date
+                                        ).format("HH:mm")}
+                                      </section>
+                                    </div>
+                                  </div>
                                 </div>
                                 <div>
-                                  <section className="text-sm text-gray-500 dark:text-gray-400">
-                                    {dayjs(transaction.transaction_date).format(
-                                      "HH:mm"
+                                  <section
+                                    className={cn(
+                                      "font-medium text-base sm:text-lg",
+                                      amountColor(
+                                        transaction.transaction_amount
+                                      )
                                     )}
+                                  >
+                                    {numeral(
+                                      transaction.transaction_amount
+                                    ).format("0,0.00")}
                                   </section>
                                 </div>
                               </div>
-                            </div>
-                            <div>
-                              <section
-                                className={cn(
-                                  "font-medium text-base sm:text-lg",
-                                  amountColor(transaction.transaction_amount)
-                                )}
-                              >
-                                {numeral(transaction.transaction_amount).format(
-                                  "0,0.00"
-                                )}
-                              </section>
-                            </div>
-                          </div>
+                            )}
+                          </DebtPaymentFormDialog>
                         )}
                       </TransferFormDialog>
                     )}

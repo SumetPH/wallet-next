@@ -6,8 +6,7 @@ export type Category = {
   category_id: string;
   category_name: string;
   category_type_id: string;
-  category_created_at: string;
-  category_updated_at: string;
+  category_date: string;
   user_id: string;
   total: string;
 };

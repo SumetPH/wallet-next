@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import db from "@/lib/db";
 import { v4 as uuid } from "uuid";
+import dayjs from "dayjs";
 
 interface GoogleUser {
   sub: string;
@@ -54,7 +55,9 @@ export async function GET(req: NextRequest) {
         sessionCookie.value,
         sessionCookie.attributes
       );
-      cookies().set("username", existingUser.user_name);
+      cookies().set("username", existingUser.user_name, {
+        expires: dayjs().add(1, "years").toDate(),
+      });
     } else {
       const userId = uuid();
       await db
@@ -73,7 +76,9 @@ export async function GET(req: NextRequest) {
         sessionCookie.value,
         sessionCookie.attributes
       );
-      cookies().set("username", googleUser.name);
+      cookies().set("username", googleUser.name, {
+        expires: dayjs().add(1, "years").toDate(),
+      });
     }
 
     return Response.redirect(new URL("/transaction", req.url));

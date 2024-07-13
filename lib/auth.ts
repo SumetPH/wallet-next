@@ -14,8 +14,7 @@ declare module "lucia" {
 interface DatabaseUserAttributes {
   id: string;
   user_name: string;
-  user_created_at: string;
-  user_updated_at: string;
+  user_date: string;
   user_password: string | null;
   user_provider: string;
   user_email: string;
@@ -32,7 +31,6 @@ export const adapter = new NodePostgresAdapter(
 );
 
 export const lucia = new Lucia(adapter, {
-  sessionExpiresIn: new TimeSpan(30, "d"),
   sessionCookie: {
     expires: false,
     attributes: {

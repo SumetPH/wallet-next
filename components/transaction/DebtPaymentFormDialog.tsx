@@ -51,22 +51,22 @@ type Props = {
 };
 
 const schema = z.object({
-  transferAmount: z
+  debtPaymentAmount: z
     .string({ required_error: "กรุณากรอกจํานวนเงิน" })
     .min(1, { message: "กรุณากรอกจํานวนเงิน" }),
-  transferNote: z.string().optional(),
-  transferDate: z.date({ required_error: "กรุณาเลือกวันที่" }),
-  transferFromAccountId: z
+  debtPaymentNote: z.string().optional(),
+  debtPaymentDate: z.date({ required_error: "กรุณาเลือกวันที่" }),
+  debtPaymentFromAccountId: z
     .string({ required_error: "กรุณาเลือกบัญชีต้นทาง" })
     .min(1, { message: "กรุณาเลือกบัญชีต้นทาง" }),
-  transferToAccountId: z
+  debtPaymentToAccountId: z
     .string({ required_error: "กรุณาเลือกบัญชีปลายทาง" })
     .min(1, { message: "กรุณาเลือกบัญชีปลายทาง" }),
 });
 
 type FormData = z.infer<typeof schema>;
 
-export default function TransferFormDialog({
+export default function DebtPaymentFormDialog({
   children,
   mode,
   transaction,
@@ -77,11 +77,11 @@ export default function TransferFormDialog({
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      transferAmount: "",
-      transferNote: "",
-      transferDate: dayjs().toDate(),
-      transferFromAccountId: "",
-      transferToAccountId: "",
+      debtPaymentAmount: "",
+      debtPaymentNote: "",
+      debtPaymentDate: dayjs().toDate(),
+      debtPaymentFromAccountId: "",
+      debtPaymentToAccountId: "",
     },
   });
 
@@ -93,39 +93,44 @@ export default function TransferFormDialog({
     setDialog(true);
 
     if (transaction && mode === "edit") {
-      form.setValue("transferAmount", transaction.transfer_amount ?? "");
-      form.setValue("transferNote", transaction.transfer_note ?? "");
-      form.setValue("transferDate", dayjs(transaction.transfer_date).toDate());
+      form.setValue("debtPaymentAmount", transaction.debt_payment_amount ?? "");
+      form.setValue("debtPaymentNote", transaction.debt_payment_note ?? "");
       form.setValue(
-        "transferFromAccountId",
-        transaction.transfer_from_account_id ?? ""
+        "debtPaymentDate",
+        dayjs(transaction.debt_payment_date).toDate()
       );
       form.setValue(
-        "transferToAccountId",
-        transaction.transfer_to_account_id ?? ""
+        "debtPaymentFromAccountId",
+        transaction.debt_payment_from_account_id ?? ""
+      );
+      form.setValue(
+        "debtPaymentToAccountId",
+        transaction.debt_payment_to_account_id ?? ""
       );
     }
   };
 
   const submit = (data: FormData) => {
     if (mode === "create") {
-      createTransfer(data);
+      createDebtPayment(data);
     } else {
-      updateTransfer(data);
+      updateDebtPayment(data);
     }
   };
 
-  const createTransfer = async (data: FormData) => {
+  const createDebtPayment = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const res = await fetch("/api/v1/transfer-create", {
+      const res = await fetch("/api/v1/debt-payment-create", {
         method: "POST",
         body: JSON.stringify({
-          transfer_amount: data.transferAmount,
-          transfer_note: data.transferNote,
-          transfer_date: dayjs(data.transferDate).format("YYYY-MM-DD HH:mm:ss"),
-          transfer_from_account_id: data.transferFromAccountId,
-          transfer_to_account_id: data.transferToAccountId,
+          debt_payment_amount: data.debtPaymentAmount,
+          debt_payment_note: data.debtPaymentNote,
+          debt_payment_date: dayjs(data.debtPaymentDate).format(
+            "YYYY-MM-DD HH:mm:ss"
+          ),
+          debt_payment_from_account_id: data.debtPaymentFromAccountId,
+          debt_payment_to_account_id: data.debtPaymentToAccountId,
         }),
       });
 
@@ -148,18 +153,20 @@ export default function TransferFormDialog({
     }
   };
 
-  const updateTransfer = async (data: FormData) => {
+  const updateDebtPayment = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const res = await fetch("/api/v1/transfer-update", {
+      const res = await fetch("/api/v1/debt-payment-update", {
         method: "PUT",
         body: JSON.stringify({
-          transfer_id: transaction?.transfer_id,
-          transfer_amount: data.transferAmount,
-          transfer_note: data.transferNote,
-          transfer_date: dayjs(data.transferDate).format("YYYY-MM-DD HH:mm:ss"),
-          transfer_from_account_id: data.transferFromAccountId,
-          transfer_to_account_id: data.transferToAccountId,
+          debt_payment_id: transaction?.debt_payment_id,
+          debt_payment_amount: data.debtPaymentAmount,
+          debt_payment_note: data.debtPaymentNote,
+          debt_payment_date: dayjs(data.debtPaymentDate).format(
+            "YYYY-MM-DD HH:mm:ss"
+          ),
+          debt_payment_from_account_id: data.debtPaymentFromAccountId,
+          debt_payment_to_account_id: data.debtPaymentToAccountId,
         }),
       });
       if (res.status === 200) {
@@ -194,13 +201,13 @@ export default function TransferFormDialog({
           <Form {...form}>
             <form onSubmit={form.handleSubmit(submit)}>
               <DialogHeader>
-                <DialogTitle className="mb-4">โอนเงิน</DialogTitle>
+                <DialogTitle className="mb-4">ชําระหนี้</DialogTitle>
                 <DialogDescription></DialogDescription>
               </DialogHeader>
               <div>
                 <FormField
                   control={form.control}
-                  name="transferAmount"
+                  name="debtPaymentAmount"
                   render={({ field }) => (
                     <FormItem className="mb-4">
                       <FormLabel>จํานวน</FormLabel>
@@ -223,7 +230,7 @@ export default function TransferFormDialog({
 
                 <FormField
                   control={form.control}
-                  name="transferFromAccountId"
+                  name="debtPaymentFromAccountId"
                   render={({ field }) => (
                     <FormItem className="mb-4">
                       <FormLabel>บัญชีต้นทาง</FormLabel>
@@ -258,7 +265,7 @@ export default function TransferFormDialog({
                                   value={account.account_id}
                                   disabled={
                                     account.account_id ===
-                                    form.getValues().transferToAccountId
+                                    form.getValues().debtPaymentToAccountId
                                   }
                                 >
                                   {account.account_name}
@@ -275,7 +282,7 @@ export default function TransferFormDialog({
                 />
                 <FormField
                   control={form.control}
-                  name="transferToAccountId"
+                  name="debtPaymentToAccountId"
                   render={({ field }) => (
                     <FormItem className="mb-4">
                       <FormLabel>บัญชีปลายทาง</FormLabel>
@@ -310,7 +317,7 @@ export default function TransferFormDialog({
                                   value={account.account_id}
                                   disabled={
                                     account.account_id ===
-                                    form.getValues().transferFromAccountId
+                                    form.getValues().debtPaymentFromAccountId
                                   }
                                 >
                                   {account.account_name}
@@ -328,7 +335,7 @@ export default function TransferFormDialog({
 
                 <FormField
                   control={form.control}
-                  name="transferDate"
+                  name="debtPaymentDate"
                   render={({ field }) => (
                     <FormItem className="mb-4">
                       <FormLabel className="text-left">วันที่</FormLabel>

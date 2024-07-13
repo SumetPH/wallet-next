@@ -26,7 +26,7 @@ const schema = z.object({
   categoryTypeId: z
     .set(z.string())
     .min(1, { message: "กรุณาเลือกประเภทหมวดหมู่" }),
-  categoryCreatedAt: z.string().datetime(),
+  categoryDate: z.string().datetime(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -51,8 +51,8 @@ export const CategoryFormModal = forwardRef<CategoryFormModalRef, Props>(
         categoryTypeId: category?.category_type_id
           ? new Set([category?.category_type_id])
           : new Set([]),
-        categoryCreatedAt: category?.category_created_at
-          ? new Date(category?.category_created_at).toISOString()
+        categoryDate: category?.category_date
+          ? new Date(category?.category_date).toISOString()
           : new Date().toISOString(),
       });
       onOpen();
@@ -179,7 +179,7 @@ export const CategoryFormModal = forwardRef<CategoryFormModalRef, Props>(
 
                   <Controller
                     control={form.control}
-                    name="categoryCreatedAt"
+                    name="categoryDate"
                     render={({ field }) => (
                       <I18nProvider locale="en-UK">
                         <DatePicker

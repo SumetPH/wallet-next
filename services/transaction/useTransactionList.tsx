@@ -28,9 +28,13 @@ export interface Transaction {
   transfer_note: string | null;
   transfer_date: string | null;
   transfer_from_account_id: string | null;
-  transfer_from_account_name: string | null;
   transfer_to_account_id: string | null;
-  transfer_to_account_name: string | null;
+  debt_payment_id: null | string;
+  debt_payment_amount: null | string;
+  debt_payment_note: null | string;
+  debt_payment_date: null | string;
+  debt_payment_from_account_id: null | string;
+  debt_payment_to_account_id: null | string;
 }
 
 type Props = {

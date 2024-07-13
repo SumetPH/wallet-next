@@ -72,9 +72,13 @@ export async function GET(req: NextRequest) {
                     'transfer_note', t.transfer_note,
                     'transfer_date', to_char(t.transfer_date, 'YYYY-MM-DD HH24:MI:SS'),
                     'transfer_from_account_id', t.transfer_from_account_id,
-                    'transfer_from_account_name', (select account_name from account where account_id = t.transfer_from_account_id),
                     'transfer_to_account_id', t.transfer_to_account_id,
-                    'transfer_to_account_name', (select account_name from account where account_id = t.transfer_to_account_id)
+                    'debt_payment_id', t.debt_payment_id,
+                    'debt_payment_amount', t.debt_payment_amount::text,
+                    'debt_payment_note', t.debt_payment_note,
+                    'debt_payment_date', to_char(t.debt_payment_date, 'YYYY-MM-DD HH24:MI:SS'),
+                    'debt_payment_from_account_id', t.debt_payment_from_account_id,
+                    'debt_payment_to_account_id', t.debt_payment_to_account_id
                 ) order by t.transaction_date desc
               )
             `.as("transactions"),

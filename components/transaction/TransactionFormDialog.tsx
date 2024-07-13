@@ -338,7 +338,7 @@ export default function TransactionFormDialog({
                   control={form.control}
                   name="createdAt"
                   render={({ field }) => (
-                    <FormItem className="mb-4 flex flex-col">
+                    <FormItem className="mb-4">
                       <FormLabel className="text-left">วันที่</FormLabel>
                       <Popover>
                         <FormControl>
@@ -346,7 +346,7 @@ export default function TransactionFormDialog({
                             <Button
                               variant="outline"
                               className={cn(
-                                "justify-start text-left font-normal",
+                                "flex justify-start font-normal w-full",
                                 !field.value && "text-muted-foreground"
                               )}
                             >

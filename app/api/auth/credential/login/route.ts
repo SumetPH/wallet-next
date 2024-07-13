@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import db from "@/lib/db";
 import { z } from "zod";
 import bcrypt from "bcrypt";
+import dayjs from "dayjs";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +44,9 @@ export async function POST(req: NextRequest) {
       sessionCookie.attributes
     );
 
-    cookies().set("username", existingUser.user_name);
+    cookies().set("username", existingUser.user_name, {
+      expires: dayjs().add(1, "years").toDate(),
+    });
 
     return Response.json({ message: "login success" }, { status: 200 });
   } catch (error) {

@@ -6,8 +6,8 @@ import dayjs from "dayjs";
 import numeral from "numeral";
 import { Avatar, Progress } from "@nextui-org/react";
 import useBudgetList from "@/services/budget/useBudgetList";
-import clsx from "clsx";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export default function BudgetPage() {
   const router = useRouter();
@@ -94,7 +94,7 @@ export default function BudgetPage() {
                 />
               </section>
               <section
-                className={clsx(
+                className={cn(
                   "text-end",
                   Number(budget.remain) < 0 ? "text-red-600" : "text-green-600"
                 )}
