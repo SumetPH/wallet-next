@@ -128,8 +128,8 @@ export default function TransactionList({
                                     </AvatarFallback>
                                   </Avatar>
                                   <div className="text-xs sm:text-sm">
-                                    <div className="flex flex-wrap gap-2">
-                                      <section className="font-medium">
+                                    <div className="flex flex-wrap">
+                                      <section className="font-medium mr-1">
                                         {transaction.account_name}
                                       </section>
                                       <section className="font-bold">
