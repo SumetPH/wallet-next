@@ -14,8 +14,7 @@ export interface AccountType {
 export interface Account {
   account_id: string;
   account_name: string;
-  account_created_at: string;
-  account_updated_at: string;
+  account_date: string;
   account_type_id: string;
   account_type_name: string;
   account_balance: string;

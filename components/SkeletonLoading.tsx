@@ -13,7 +13,7 @@ export default function SkeletonLoading({
   return (
     <>
       {isLoading && (
-        <div className="my-6">
+        <div data-testid="loading" className="my-6">
           <Skeleton className="h-6 w-full my-4" />
           <Skeleton className="h-6 w-full my-4" />
           <Skeleton className="h-24 w-full my-4" />

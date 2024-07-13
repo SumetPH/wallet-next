@@ -88,7 +88,7 @@ export default function AccountFormDialog({
       form.setValue("accountName", account.account_name);
       form.setValue("accountTypeId", account.account_type_id);
       form.setValue("balance", account.account_balance);
-      form.setValue("createdAt", dayjs(account.account_created_at).toDate());
+      form.setValue("createdAt", dayjs(account.account_date).toDate());
     }
   };
 
@@ -180,7 +180,7 @@ export default function AccountFormDialog({
           <Form {...form}>
             <form onSubmit={form.handleSubmit(submit)}>
               <DialogHeader>
-                <DialogTitle className="mb-4">
+                <DialogTitle className="mb-4" data-testid="dialog-title">
                   {mode === "create" ? "เพิ่มบัญชี" : "แก้ไขบัญชี"}
                 </DialogTitle>
                 <DialogDescription></DialogDescription>
@@ -194,6 +194,7 @@ export default function AccountFormDialog({
                       <FormLabel>ชื่อบัญชี</FormLabel>
                       <FormControl>
                         <Input
+                          data-testid="input-account-name"
                           defaultValue={field.value}
                           onChange={field.onChange}
                           placeholder="ชื่อบัญชี"
@@ -215,7 +216,7 @@ export default function AccountFormDialog({
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger data-testid="select-account-type">
                             <SelectValue placeholder="เลือกประเภทบัญชี" />
                           </SelectTrigger>
                         </FormControl>
@@ -253,6 +254,7 @@ export default function AccountFormDialog({
                       <FormLabel>ยอดเริ่มต้น</FormLabel>
                       <FormControl>
                         <CurrencyInput
+                          data-testid="input-account-balance"
                           placeholder="จํานวน"
                           className="input-currency"
                           defaultValue={field.value}
@@ -273,7 +275,7 @@ export default function AccountFormDialog({
                       <FormLabel className="text-left">วันที่</FormLabel>
                       <Popover>
                         <FormControl>
-                          <PopoverTrigger asChild>
+                          <PopoverTrigger asChild data-testid="date-picker">
                             <Button
                               variant="outline"
                               className={cn(
@@ -316,8 +318,11 @@ export default function AccountFormDialog({
                 />
               </div>
               <DialogFooter className="sm:justify-between gap-4 pt-4 ">
-                <Button type="submit">บันทึก</Button>
+                <Button data-testid="button-submit" type="submit">
+                  บันทึก
+                </Button>
                 <Button
+                  data-testid="button-cancel"
                   type="reset"
                   className="bg-red-500"
                   onClick={() => setDialog(false)}

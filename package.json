@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start -p 3010",
     "lint": "next lint",
+    "test": "vitest",
     "db:pull": "kysely-codegen",
     "db:pull-dev": "DATABASE_URL=postgres://sumetph@localhost/wallet kysely-codegen"
   },
@@ -38,6 +39,7 @@
     "lucia": "^3.2.0",
     "lucide-react": "^0.400.0",
     "next": "14.2.3",
+    "next-router-mock": "^0.9.13",
     "next-themes": "^0.3.0",
     "numeral": "^2.0.6",
     "pg": "^8.12.0",
@@ -55,6 +57,7 @@
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.2.4",
+    "@testing-library/react": "^16.0.0",
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
     "@types/js-cookie": "^3.0.6",
@@ -64,12 +67,15 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/uuid": "^9.0.8",
+    "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "eslint-config-prettier": "^9.1.0",
+    "jsdom": "^24.1.0",
     "kysely-codegen": "^0.15.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^2.0.2"
   }
 }

@@ -8,10 +8,7 @@ import TransactionHeader from "./TransactionHeader";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { amountColor, cn } from "@/lib/utils";
 import { EllipsisVertical } from "lucide-react";
-import type {
-  Transaction,
-  TransactionRes,
-} from "@/services/transaction/useTransactionList";
+import type { TransactionRes } from "@/services/transaction/useTransactionList";
 import {
   DropdownMenu,
   DropdownMenuContent,

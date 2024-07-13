@@ -45,8 +45,11 @@ export default function AccountList({
         accountTypeList.map((accountType) => (
           <div key={accountType.account_type_id}>
             <div className="flex justify-between gap-2 p-1 bg-gray-100 dark:bg-gray-800">
-              <span>{accountType.account_type_name}</span>
+              <span data-testid="account-type-name">
+                {accountType.account_type_name}
+              </span>
               <span
+                data-testid="account-type-balance"
                 className={cn(
                   "font-medium",
                   amountColor(accountType.account_type_balance)
@@ -105,8 +108,11 @@ export default function AccountList({
                             </AvatarFallback>
                           </Avatar>
                           <div className="text-sm sm:text-base">
-                            <section>{account.account_name}</section>
+                            <section data-testid="account-name">
+                              {account.account_name}
+                            </section>
                             <section
+                              data-testid="account-balance"
                               className={cn(
                                 "font-medium",
                                 amountColor(account.net_balance)
@@ -114,7 +120,6 @@ export default function AccountList({
                             >
                               {numeral(account.net_balance).format("0,0.00")}{" "}
                               บาท
-                              <br />
                             </section>
                           </div>
                         </div>
