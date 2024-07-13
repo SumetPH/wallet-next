@@ -2,14 +2,18 @@
 
 import CurrencyInput from "react-currency-input-field";
 import dayjs from "dayjs";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import useAccountList from "@/services/account/useAccountList";
-import { Button } from "../ui/button";
-import { Calendar } from "../ui/calendar";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { TimePicker } from "../ui/time-picker/time-picker";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { TimePicker } from "@/components/ui/time-picker/time-picker";
 import { Transaction } from "@/services/transaction/useTransactionList";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,7 +25,7 @@ import {
   DialogTitle,
   DialogDescription,
   Dialog,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -31,7 +35,7 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -39,50 +43,57 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
-import { toast } from "../ui/use-toast";
+} from "@/components/ui/form";
+import useCategoryList from "@/services/category/useCategoryList";
+import { toast } from "@/components/ui/use-toast";
 import useLoadingStore from "@/stores/useLoading";
+import { TransactionType } from "@/services/transactionType/useTransactionType";
 import numeral from "numeral";
 
 type Props = {
-  children: ({ openDialog }: { openDialog: () => void }) => React.ReactNode;
+  dialog: boolean;
+  setDialog: React.Dispatch<React.SetStateAction<boolean>>;
   mode: "create" | "edit";
   transaction?: Transaction;
+  transactionType: string;
+  categoryType: string;
   onSuccess?: () => void;
 };
 
 const schema = z.object({
-  debtPaymentAmount: z
+  transactionAmount: z
     .string({ required_error: "กรุณากรอกจํานวนเงิน" })
     .min(1, { message: "กรุณากรอกจํานวนเงิน" }),
-  debtPaymentNote: z.string().optional(),
-  debtPaymentDate: z.date({ required_error: "กรุณาเลือกวันที่" }),
-  debtPaymentFromAccountId: z
-    .string({ required_error: "กรุณาเลือกบัญชีต้นทาง" })
-    .min(1, { message: "กรุณาเลือกบัญชีต้นทาง" }),
-  debtPaymentToAccountId: z
-    .string({ required_error: "กรุณาเลือกบัญชีปลายทาง" })
-    .min(1, { message: "กรุณาเลือกบัญชีปลายทาง" }),
+  accountId: z
+    .string({ required_error: "กรุณาเลือกบัญชี" })
+    .min(1, { message: "กรุณาเลือกบัญชี" }),
+  categoryId: z
+    .string({ required_error: "กรุณาเลือกหมวดหมู่" })
+    .min(1, { message: "กรุณาเลือกหมวดหมู่" }),
+  transactionNote: z.string().optional(),
+  createdAt: z.date({ required_error: "กรุณาเลือกวันที่" }),
 });
 
 type FormData = z.infer<typeof schema>;
 
-export default function DebtPaymentFormDialog({
-  children,
+export default function TransactionFormDialog({
+  dialog,
+  setDialog,
   mode,
   transaction,
+  categoryType,
+  transactionType,
   onSuccess,
 }: Props) {
-  const [dialog, setDialog] = useState(false);
   const { setIsLoading } = useLoadingStore();
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      debtPaymentAmount: "",
-      debtPaymentNote: "",
-      debtPaymentDate: dayjs().toDate(),
-      debtPaymentFromAccountId: "",
-      debtPaymentToAccountId: "",
+      transactionAmount: "",
+      accountId: "",
+      categoryId: "",
+      transactionNote: "",
+      createdAt: dayjs().toDate(),
     },
   });
 
@@ -90,48 +101,55 @@ export default function DebtPaymentFormDialog({
     enable: dialog,
   });
 
-  const openDialog = () => {
+  const categoryList = useCategoryList({
+    enable: dialog,
+    categoryType: categoryType,
+  });
+
+  const openDialog = useCallback(() => {
     setDialog(true);
 
     if (transaction && mode === "edit") {
-      form.setValue("debtPaymentAmount", transaction.debt_payment_amount ?? "");
-      form.setValue("debtPaymentNote", transaction.debt_payment_note ?? "");
       form.setValue(
-        "debtPaymentDate",
-        dayjs(transaction.debt_payment_date).toDate()
+        "transactionAmount",
+        transaction.transaction_amount.replace("-", "")
       );
-      form.setValue(
-        "debtPaymentFromAccountId",
-        transaction.debt_payment_from_account_id ?? ""
-      );
-      form.setValue(
-        "debtPaymentToAccountId",
-        transaction.debt_payment_to_account_id ?? ""
-      );
+      form.setValue("accountId", transaction.account_id ?? "");
+      form.setValue("categoryId", transaction.category_id ?? "");
+      form.setValue("transactionNote", transaction.transaction_note ?? "");
+      form.setValue("createdAt", dayjs(transaction.transaction_date).toDate());
     }
-  };
+  }, [form, mode, setDialog, transaction]);
+
+  useEffect(() => {
+    if (dialog) {
+      openDialog();
+    }
+  }, [dialog, openDialog]);
 
   const submit = (data: FormData) => {
     if (mode === "create") {
-      createDebtPayment(data);
+      createTransaction(data);
     } else {
-      updateDebtPayment(data);
+      updateTransaction(data);
     }
   };
 
-  const createDebtPayment = async (data: FormData) => {
+  const createTransaction = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const res = await fetch("/api/v1/debt-payment-create", {
+      const res = await fetch("/api/v1/transaction-create", {
         method: "POST",
         body: JSON.stringify({
-          debt_payment_amount: data.debtPaymentAmount,
-          debt_payment_note: data.debtPaymentNote,
-          debt_payment_date: dayjs(data.debtPaymentDate).format(
-            "YYYY-MM-DD HH:mm:ss"
-          ),
-          debt_payment_from_account_id: data.debtPaymentFromAccountId,
-          debt_payment_to_account_id: data.debtPaymentToAccountId,
+          transaction_amount:
+            transactionType === TransactionType.expense
+              ? `-${data.transactionAmount}`
+              : data.transactionAmount,
+          transaction_note: data.transactionNote,
+          transaction_date: dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+          transaction_type_id: transactionType,
+          account_id: data.accountId,
+          category_id: data.categoryId,
         }),
       });
 
@@ -154,20 +172,23 @@ export default function DebtPaymentFormDialog({
     }
   };
 
-  const updateDebtPayment = async (data: FormData) => {
+  const updateTransaction = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const res = await fetch("/api/v1/debt-payment-update", {
+      const res = await fetch("/api/v1/transaction-update", {
         method: "PUT",
         body: JSON.stringify({
-          debt_payment_id: transaction?.debt_payment_id,
-          debt_payment_amount: data.debtPaymentAmount,
-          debt_payment_note: data.debtPaymentNote,
-          debt_payment_date: dayjs(data.debtPaymentDate).format(
-            "YYYY-MM-DD HH:mm:ss"
-          ),
-          debt_payment_from_account_id: data.debtPaymentFromAccountId,
-          debt_payment_to_account_id: data.debtPaymentToAccountId,
+          transaction_id: transaction?.transaction_id,
+
+          transaction_amount:
+            transactionType === TransactionType.expense
+              ? `-${data.transactionAmount}`
+              : data.transactionAmount,
+          transaction_note: data.transactionNote,
+          transaction_date: dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+          transaction_type_id: transaction?.transaction_type_id,
+          account_id: data.accountId,
+          category_id: data.categoryId,
         }),
       });
       if (res.status === 200) {
@@ -191,8 +212,6 @@ export default function DebtPaymentFormDialog({
 
   return (
     <>
-      {children({ openDialog })}
-
       <Dialog open={dialog} onOpenChange={(value) => setDialog(value)}>
         <DialogContent
           onEscapeKeyDown={(e) => e.preventDefault()}
@@ -202,13 +221,19 @@ export default function DebtPaymentFormDialog({
           <Form {...form}>
             <form onSubmit={form.handleSubmit(submit)}>
               <DialogHeader>
-                <DialogTitle className="mb-4">ชําระหนี้</DialogTitle>
+                <DialogTitle className="mb-4">
+                  {transactionType === TransactionType.expense ? (
+                    <span className="text-red-600">รายจ่าย</span>
+                  ) : (
+                    <span className="text-green-600">รายรับ</span>
+                  )}
+                </DialogTitle>
                 <DialogDescription></DialogDescription>
               </DialogHeader>
               <div>
                 <FormField
                   control={form.control}
-                  name="debtPaymentAmount"
+                  name="transactionAmount"
                   render={({ field }) => (
                     <FormItem className="mb-4">
                       <FormLabel>จํานวน</FormLabel>
@@ -231,10 +256,10 @@ export default function DebtPaymentFormDialog({
 
                 <FormField
                   control={form.control}
-                  name="debtPaymentFromAccountId"
+                  name="accountId"
                   render={({ field }) => (
                     <FormItem className="mb-4">
-                      <FormLabel>บัญชีต้นทาง</FormLabel>
+                      <FormLabel>บัญชี</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -265,69 +290,6 @@ export default function DebtPaymentFormDialog({
                                   <SelectItem
                                     key={account.account_id}
                                     value={account.account_id}
-                                    disabled={
-                                      account.account_id ===
-                                      form.getValues().debtPaymentToAccountId
-                                    }
-                                  >
-                                    <span>{account.account_name} : </span>
-                                    <span>
-                                      {numeral(account.net_balance).format(
-                                        "0,0.00"
-                                      )}{" "}
-                                      บาท
-                                    </span>
-                                  </SelectItem>
-                                ))}
-                                <SelectSeparator />
-                              </SelectGroup>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="debtPaymentToAccountId"
-                  render={({ field }) => (
-                    <FormItem className="mb-4">
-                      <FormLabel>บัญชีปลายทาง</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="เลือกบัญชี" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {accountList.isFetching && (
-                            <SelectItem value="loading" disabled>
-                              กำลังโหลด...
-                            </SelectItem>
-                          )}
-                          {accountList.data?.length === 0 && (
-                            <SelectItem value="empty" disabled>
-                              ไม่พบหมวดหมู่
-                            </SelectItem>
-                          )}
-                          {!accountList.isFetching &&
-                            accountList.data?.map((accountType) => (
-                              <SelectGroup key={accountType.account_type_id}>
-                                <SelectLabel>
-                                  {accountType.account_type_name}
-                                </SelectLabel>
-                                {accountType.accounts.map((account) => (
-                                  <SelectItem
-                                    key={account.account_id}
-                                    value={account.account_id}
-                                    disabled={
-                                      account.account_id ===
-                                      form.getValues().debtPaymentFromAccountId
-                                    }
                                   >
                                     <span>{account.account_name} : </span>
                                     <span>
@@ -350,7 +312,49 @@ export default function DebtPaymentFormDialog({
 
                 <FormField
                   control={form.control}
-                  name="debtPaymentDate"
+                  name="categoryId"
+                  render={({ field }) => (
+                    <FormItem className="mb-4">
+                      <FormLabel>หมวดหมู่</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="เลือกหมวดหมู่" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {categoryList.isFetching && (
+                            <SelectItem value="loading" disabled>
+                              กำลังโหลด...
+                            </SelectItem>
+                          )}
+                          {categoryList.data?.length === 0 && (
+                            <SelectItem value="empty" disabled>
+                              ไม่พบหมวดหมู่
+                            </SelectItem>
+                          )}
+                          {!categoryList.isFetching &&
+                            categoryList.data?.map((category) => (
+                              <SelectItem
+                                key={category.category_id}
+                                value={category.category_id}
+                              >
+                                {category.category_name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="createdAt"
                   render={({ field }) => (
                     <FormItem className="mb-4">
                       <FormLabel className="text-left">วันที่</FormLabel>

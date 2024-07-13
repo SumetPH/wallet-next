@@ -1,18 +1,12 @@
-import { cleanup, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { screen } from "@testing-library/react";
+import { describe, expect, test } from "vitest";
 import TransactionHeader from "./TransactionHeader";
-import ReactQueryProvider from "../provider/ReactQueryProvider";
 import * as mockRouter from "next-router-mock";
+import { render } from "@/test/test-utils";
 
 describe("render TransactionHeader", () => {
-  beforeEach(() => {
-    cleanup();
-  });
-
   test('should show "รายการ" when title is null', () => {
-    render(<TransactionHeader onSuccess={() => {}} />, {
-      wrapper: ReactQueryProvider,
-    });
+    render(<TransactionHeader onSuccess={() => {}} />);
 
     expect(screen.getByTestId("title").innerHTML).toBe("รายการ");
   });
@@ -20,9 +14,7 @@ describe("render TransactionHeader", () => {
   test('should show "รายการ : KTC" when title is KTC', () => {
     mockRouter.default.push("/account/1?title=KTC");
 
-    render(<TransactionHeader onSuccess={() => {}} />, {
-      wrapper: ReactQueryProvider,
-    });
+    render(<TransactionHeader onSuccess={() => {}} />);
 
     expect(screen.getByTestId("title").innerHTML).toBe("รายการ : KTC");
   });

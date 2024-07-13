@@ -1,13 +1,9 @@
-import { beforeEach, describe, expect, test } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, test } from "vitest";
+import { fireEvent, screen } from "@testing-library/react";
 import AccountFormDialog from "./AccountFormDialog";
-import ReactQueryProvider from "@/components/provider/ReactQueryProvider";
+import { render } from "@/test/test-utils";
 
 describe("render AccountFormDialog", () => {
-  beforeEach(() => {
-    cleanup();
-  });
-
   test('should show "เพิ่มบัญชี" when mode is "create"', () => {
     render(
       <AccountFormDialog mode="create">
@@ -16,8 +12,7 @@ describe("render AccountFormDialog", () => {
             test
           </button>
         )}
-      </AccountFormDialog>,
-      { wrapper: ReactQueryProvider }
+      </AccountFormDialog>
     );
 
     fireEvent.click(screen.getByTestId("btn-open-dialog"));
@@ -33,8 +28,7 @@ describe("render AccountFormDialog", () => {
             test
           </button>
         )}
-      </AccountFormDialog>,
-      { wrapper: ReactQueryProvider }
+      </AccountFormDialog>
     );
 
     fireEvent.click(screen.getByTestId("btn-open-dialog"));
@@ -50,8 +44,7 @@ describe("render AccountFormDialog", () => {
             test
           </button>
         )}
-      </AccountFormDialog>,
-      { wrapper: ReactQueryProvider }
+      </AccountFormDialog>
     );
 
     fireEvent.click(screen.getByTestId("btn-open-dialog"));

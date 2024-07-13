@@ -2,14 +2,18 @@
 
 import CurrencyInput from "react-currency-input-field";
 import dayjs from "dayjs";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import useAccountList from "@/services/account/useAccountList";
-import { Button } from "../ui/button";
-import { Calendar } from "../ui/calendar";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { TimePicker } from "../ui/time-picker/time-picker";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { TimePicker } from "@/components/ui/time-picker/time-picker";
 import { Transaction } from "@/services/transaction/useTransactionList";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,7 +25,7 @@ import {
   DialogTitle,
   DialogDescription,
   Dialog,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -31,7 +35,7 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -39,13 +43,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
-import { toast } from "../ui/use-toast";
+} from "@/components/ui/form";
+import { toast } from "@/components/ui/use-toast";
 import useLoadingStore from "@/stores/useLoading";
 import numeral from "numeral";
 
 type Props = {
-  children: ({ openDialog }: { openDialog: () => void }) => React.ReactNode;
+  dialog: boolean;
+  setDialog: React.Dispatch<React.SetStateAction<boolean>>;
   mode: "create" | "edit";
   transaction?: Transaction;
   onSuccess?: () => void;
@@ -68,12 +73,12 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function TransferFormDialog({
-  children,
+  dialog,
+  setDialog,
   mode,
   transaction,
   onSuccess,
 }: Props) {
-  const [dialog, setDialog] = useState(false);
   const { setIsLoading } = useLoadingStore();
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -90,7 +95,7 @@ export default function TransferFormDialog({
     enable: dialog,
   });
 
-  const openDialog = () => {
+  const openDialog = useCallback(() => {
     setDialog(true);
 
     if (transaction && mode === "edit") {
@@ -106,7 +111,13 @@ export default function TransferFormDialog({
         transaction.transfer_to_account_id ?? ""
       );
     }
-  };
+  }, [form, mode, setDialog, transaction]);
+
+  useEffect(() => {
+    if (dialog) {
+      openDialog();
+    }
+  }, [dialog, openDialog]);
 
   const submit = (data: FormData) => {
     if (mode === "create") {
@@ -184,8 +195,6 @@ export default function TransferFormDialog({
 
   return (
     <>
-      {children({ openDialog })}
-
       <Dialog open={dialog} onOpenChange={(value) => setDialog(value)}>
         <DialogContent
           onEscapeKeyDown={(e) => e.preventDefault()}

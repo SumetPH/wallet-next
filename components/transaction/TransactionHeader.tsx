@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TransactionFormDialog from "./TransactionFormDialog";
+import TransactionFormDialog from "./dialog/TransactionFormDialog";
 import { CategoryType } from "@/services/categoryType/useCategoryType";
 import { Ellipsis } from "lucide-react";
 import {
@@ -9,8 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { TransactionType } from "@/services/transactionType/useTransactionType";
-import TransferFormDialog from "./TransferFormDialog";
-import DebtPaymentFormDialog from "./DebtPaymentFormDialog";
+import TransferFormDialog from "./dialog/TransferFormDialog";
+import DebtPaymentFormDialog from "./dialog/DebtPaymentFormDialog";
 import { useSearchParams } from "next/navigation";
 
 type Props = {
@@ -20,6 +20,10 @@ type Props = {
 export default function TransactionHeader({ onSuccess }: Props) {
   const searchParams = useSearchParams();
   const title = searchParams.get("title");
+
+  const [isTransactionOpen, setIsTransactionOpen] = useState(false);
+  const [isTransferOpen, setIsTransferOpen] = useState(false);
+  const [isDebtPaymentOpen, setIsDebtPaymentOpen] = useState(false);
 
   const [transactionType, setTransactionType] = useState(
     TransactionType.expense
@@ -37,65 +41,71 @@ export default function TransactionHeader({ onSuccess }: Props) {
           )}
         </section>
         <section>
-          <TransactionFormDialog
-            mode="create"
-            transactionType={transactionType}
-            categoryType={categoryType}
-            onSuccess={onSuccess}
-          >
-            {({ openDialog: openDialogTransaction }) => (
-              <TransferFormDialog mode="create" onSuccess={onSuccess}>
-                {({ openDialog: openDialogTransfer }) => (
-                  <DebtPaymentFormDialog mode="create" onSuccess={onSuccess}>
-                    {({ openDialog: openDialogDebtPayment }) => (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger>
-                          <Ellipsis />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            data-testid="btn-create-transaction"
-                            onClick={() => {
-                              setTransactionType(TransactionType.expense);
-                              setCategoryType(CategoryType.expense);
-                              openDialogTransaction();
-                            }}
-                          >
-                            เพิ่มรายจ่าย
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setTransactionType(TransactionType.income);
-                              setCategoryType(CategoryType.income);
-                              openDialogTransaction();
-                            }}
-                          >
-                            เพิ่มรายรับ
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              openDialogTransfer();
-                            }}
-                          >
-                            โอน
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              openDialogDebtPayment();
-                            }}
-                          >
-                            ชําระหนี้
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </DebtPaymentFormDialog>
-                )}
-              </TransferFormDialog>
-            )}
-          </TransactionFormDialog>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Ellipsis />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                data-testid="btn-create-transaction"
+                onClick={() => {
+                  setTransactionType(TransactionType.expense);
+                  setCategoryType(CategoryType.expense);
+                  setIsTransactionOpen(true);
+                }}
+              >
+                เพิ่มรายจ่าย
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setTransactionType(TransactionType.income);
+                  setCategoryType(CategoryType.income);
+                  setIsTransactionOpen(true);
+                }}
+              >
+                เพิ่มรายรับ
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setIsTransferOpen(true);
+                }}
+              >
+                โอน
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setIsDebtPaymentOpen(true);
+                }}
+              >
+                ชําระหนี้
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </section>
       </div>
+
+      <TransactionFormDialog
+        dialog={isTransactionOpen}
+        setDialog={setIsTransactionOpen}
+        mode="create"
+        transactionType={transactionType}
+        onSuccess={onSuccess}
+        categoryType={categoryType}
+      />
+
+      <TransferFormDialog
+        dialog={isTransferOpen}
+        setDialog={setIsTransferOpen}
+        mode="create"
+        onSuccess={onSuccess}
+      />
+
+      <DebtPaymentFormDialog
+        dialog={isDebtPaymentOpen}
+        setDialog={setIsDebtPaymentOpen}
+        mode="create"
+        onSuccess={onSuccess}
+      />
     </>
   );
 }

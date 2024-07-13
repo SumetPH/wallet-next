@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -8,25 +8,25 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "../ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 import { Transaction } from "@/services/transaction/useTransactionList";
-import { Button } from "../ui/button";
-import { toast } from "../ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
 import numeral from "numeral";
 
 type Props = {
-  children: ({ openAlert }: { openAlert: () => void }) => React.ReactNode;
+  alert: boolean;
+  setAlert: React.Dispatch<React.SetStateAction<boolean>>;
   transaction: Transaction;
   onSuccess: () => void;
 };
 
 export default function TransactionDeleteAlert({
-  children,
+  alert,
+  setAlert,
   transaction,
   onSuccess,
 }: Props) {
-  const [alert, setAlert] = useState(false);
-
   const deleteTransaction = async () => {
     try {
       await fetch("/api/v1/transaction-delete", {
@@ -98,8 +98,6 @@ export default function TransactionDeleteAlert({
 
   return (
     <>
-      {children({ openAlert: () => setAlert(true) })}
-
       <AlertDialog open={alert}>
         <AlertDialogContent>
           <AlertDialogHeader>

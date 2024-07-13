@@ -1,12 +1,8 @@
-import { beforeEach, describe, expect, test } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { describe, expect, test } from "vitest";
+import { render, screen } from "@testing-library/react";
 import SkeletonLoading from "./SkeletonLoading";
 
 describe("render SkeletonLoading", () => {
-  beforeEach(() => {
-    cleanup();
-  });
-
   test("should show loading", () => {
     render(<SkeletonLoading isLoading={true} dataLength={0} />);
     expect(screen.getByTestId("loading")).toBeDefined();

@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, test } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { describe, expect, test } from "vitest";
+import { screen } from "@testing-library/react";
 import AccountList from "./AccountList";
-import ReactQueryProvider from "@/components/provider/ReactQueryProvider";
 import { AccountType } from "@/services/account/useAccountList";
+import { render } from "@/test/test-utils";
 
 const mockData: AccountType[] = [
   {
@@ -26,20 +26,13 @@ const mockData: AccountType[] = [
 ];
 
 describe("render AccountList", () => {
-  beforeEach(() => {
-    cleanup();
-  });
-
   test("should show loading", () => {
     render(
       <AccountList
         accountTypeList={[]}
         isFetching={true}
         onSuccess={() => {}}
-      />,
-      {
-        wrapper: ReactQueryProvider,
-      }
+      />
     );
 
     expect(screen.getByTestId("loading")).toBeDefined();
@@ -51,10 +44,7 @@ describe("render AccountList", () => {
         accountTypeList={[]}
         isFetching={false}
         onSuccess={() => {}}
-      />,
-      {
-        wrapper: ReactQueryProvider,
-      }
+      />
     );
 
     expect(screen.getByText("ไม่พบข้อมูล")).toBeDefined();
@@ -66,10 +56,7 @@ describe("render AccountList", () => {
         accountTypeList={mockData}
         isFetching={false}
         onSuccess={() => {}}
-      />,
-      {
-        wrapper: ReactQueryProvider,
-      }
+      />
     );
 
     expect(screen.getByTestId("account-type-name").innerHTML).toBe("ธนาคาร");
