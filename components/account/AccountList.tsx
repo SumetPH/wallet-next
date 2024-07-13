@@ -72,7 +72,9 @@ export default function AccountList({
                       <div
                         className="p-2 border-b last:border-none flex justify-between items-center cursor-pointer"
                         onClick={() =>
-                          router.push(`/account/${account.account_id}`)
+                          router.push(
+                            `/account/${account.account_id}?title=${account.account_name}`
+                          )
                         }
                       >
                         <div className="flex gap-3 items-center">

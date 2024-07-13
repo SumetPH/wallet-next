@@ -45,7 +45,11 @@ export default function CategoryList({
             {({ openAlert: openAlertDelete }) => (
               <div
                 className="p-2 border-b last:border-none flex justify-between items-center cursor-pointer"
-                onClick={() => router.push(`/category/${category.category_id}`)}
+                onClick={() =>
+                  router.push(
+                    `/category/${category.category_id}?title=${category.category_name}`
+                  )
+                }
               >
                 <div className="flex gap-3 items-center">
                   <DropdownMenu>

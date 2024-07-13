@@ -5,22 +5,43 @@ import CategoryList from "@/components/category/CategoryList";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useCategoryList from "@/services/category/useCategoryList";
 import { CategoryType } from "@/services/categoryType/useCategoryType";
-import React, { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 export default function CategoryPage() {
-  const [tab, setTab] = useState("expense");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [tab, setTab] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const tabPrevious = searchParams.get("tab");
+    if (tabPrevious) {
+      setTab(tabPrevious);
+    } else {
+      setTab("expense");
+    }
+  }, [searchParams]);
 
   const categoryList = useCategoryList({
-    enable: true,
+    enable: !!tab,
     categoryType:
       tab === "expense" ? CategoryType.expense : CategoryType.income,
   });
+
+  const changeTab = (value: string) => {
+    setTab(value);
+    router.replace(`/category?tab=${value}`);
+  };
 
   return (
     <>
       <CategoryHeader />
 
-      <Tabs className="w-full" value={tab} onValueChange={setTab}>
+      <Tabs
+        className="w-full"
+        value={tab}
+        onValueChange={(value) => changeTab(value)}
+      >
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="expense">รายจ่าย</TabsTrigger>
           <TabsTrigger value="income">รายรับ</TabsTrigger>

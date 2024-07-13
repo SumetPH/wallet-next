@@ -314,13 +314,16 @@ export default function AccountFormDialog({
                 />
               </div>
               <DialogFooter className="sm:justify-between gap-4 pt-4 ">
-                <Button data-testid="button-submit" type="submit">
+                <Button
+                  data-testid="button-submit"
+                  className="bg-sky-600"
+                  type="submit"
+                >
                   บันทึก
                 </Button>
                 <Button
                   data-testid="button-cancel"
                   type="reset"
-                  className="bg-red-500"
                   onClick={() => setDialog(false)}
                 >
                   ยกเลิก

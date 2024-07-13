@@ -4,11 +4,13 @@ import TransactionList from "@/components/transaction/TransactionList";
 import useTransactionList from "@/services/transaction/useTransactionList";
 import React from "react";
 
-export default function AccountTransaction({
-  params,
-}: {
-  params: { accountId: string };
-}) {
+type Props = {
+  params: {
+    accountId: string;
+  };
+};
+
+export default function AccountTransaction({ params }: Props) {
   const transactionList = useTransactionList({
     accountId: params.accountId,
   });

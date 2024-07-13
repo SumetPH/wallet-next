@@ -42,6 +42,7 @@ import {
 } from "../ui/form";
 import { toast } from "../ui/use-toast";
 import useLoadingStore from "@/stores/useLoading";
+import numeral from "numeral";
 
 type Props = {
   children: ({ openDialog }: { openDialog: () => void }) => React.ReactNode;
@@ -247,26 +248,33 @@ export default function TransferFormDialog({
                               ไม่พบหมวดหมู่
                             </SelectItem>
                           )}
-                          {accountList.data?.map((accountType) => (
-                            <SelectGroup key={accountType.account_type_id}>
-                              <SelectLabel>
-                                {accountType.account_type_name}
-                              </SelectLabel>
-                              {accountType.accounts.map((account) => (
-                                <SelectItem
-                                  key={account.account_id}
-                                  value={account.account_id}
-                                  disabled={
-                                    account.account_id ===
-                                    form.getValues().transferToAccountId
-                                  }
-                                >
-                                  {account.account_name}
-                                </SelectItem>
-                              ))}
-                              <SelectSeparator />
-                            </SelectGroup>
-                          ))}
+                          {!accountList.isFetching &&
+                            accountList.data?.map((accountType) => (
+                              <SelectGroup key={accountType.account_type_id}>
+                                <SelectLabel>
+                                  {accountType.account_type_name}
+                                </SelectLabel>
+                                {accountType.accounts.map((account) => (
+                                  <SelectItem
+                                    key={account.account_id}
+                                    value={account.account_id}
+                                    disabled={
+                                      account.account_id ===
+                                      form.getValues().transferToAccountId
+                                    }
+                                  >
+                                    <span>{account.account_name} : </span>
+                                    <span>
+                                      {numeral(account.net_balance).format(
+                                        "0,0.00"
+                                      )}{" "}
+                                      บาท
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                                <SelectSeparator />
+                              </SelectGroup>
+                            ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -299,26 +307,33 @@ export default function TransferFormDialog({
                               ไม่พบหมวดหมู่
                             </SelectItem>
                           )}
-                          {accountList.data?.map((accountType) => (
-                            <SelectGroup key={accountType.account_type_id}>
-                              <SelectLabel>
-                                {accountType.account_type_name}
-                              </SelectLabel>
-                              {accountType.accounts.map((account) => (
-                                <SelectItem
-                                  key={account.account_id}
-                                  value={account.account_id}
-                                  disabled={
-                                    account.account_id ===
-                                    form.getValues().transferFromAccountId
-                                  }
-                                >
-                                  {account.account_name}
-                                </SelectItem>
-                              ))}
-                              <SelectSeparator />
-                            </SelectGroup>
-                          ))}
+                          {!accountList.isFetching &&
+                            accountList.data?.map((accountType) => (
+                              <SelectGroup key={accountType.account_type_id}>
+                                <SelectLabel>
+                                  {accountType.account_type_name}
+                                </SelectLabel>
+                                {accountType.accounts.map((account) => (
+                                  <SelectItem
+                                    key={account.account_id}
+                                    value={account.account_id}
+                                    disabled={
+                                      account.account_id ===
+                                      form.getValues().transferFromAccountId
+                                    }
+                                  >
+                                    <span>{account.account_name} : </span>
+                                    <span>
+                                      {numeral(account.net_balance).format(
+                                        "0,0.00"
+                                      )}{" "}
+                                      บาท
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                                <SelectSeparator />
+                              </SelectGroup>
+                            ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -377,12 +392,10 @@ export default function TransferFormDialog({
                 />
               </div>
               <DialogFooter className="sm:justify-between gap-4 pt-4 ">
-                <Button type="submit">บันทึก</Button>
-                <Button
-                  type="reset"
-                  className="bg-red-500"
-                  onClick={() => setDialog(false)}
-                >
+                <Button className="bg-sky-600" type="submit">
+                  บันทึก
+                </Button>
+                <Button type="reset" onClick={() => setDialog(false)}>
                   ยกเลิก
                 </Button>
               </DialogFooter>

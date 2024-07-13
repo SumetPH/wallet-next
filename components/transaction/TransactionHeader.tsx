@@ -11,12 +11,16 @@ import {
 import { TransactionType } from "@/services/transactionType/useTransactionType";
 import TransferFormDialog from "./TransferFormDialog";
 import DebtPaymentFormDialog from "./DebtPaymentFormDialog";
+import { useSearchParams } from "next/navigation";
 
 type Props = {
   onSuccess: () => void;
 };
 
 export default function TransactionHeader({ onSuccess }: Props) {
+  const searchParams = useSearchParams();
+  const title = searchParams.get("title");
+
   const [transactionType, setTransactionType] = useState(
     TransactionType.expense
   );
@@ -25,7 +29,13 @@ export default function TransactionHeader({ onSuccess }: Props) {
   return (
     <>
       <div className="flex justify-between gap-2 mb-2">
-        <section className="text-lg font-medium">รายการใช้จ่าย</section>
+        <section className="text-lg font-medium">
+          {title ? (
+            <span data-testid="title">รายการ : {title}</span>
+          ) : (
+            <span data-testid="title">รายการ</span>
+          )}
+        </section>
         <section>
           <TransactionFormDialog
             mode="create"
@@ -44,6 +54,7 @@ export default function TransactionHeader({ onSuccess }: Props) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
+                            data-testid="btn-create-transaction"
                             onClick={() => {
                               setTransactionType(TransactionType.expense);
                               setCategoryType(CategoryType.expense);
