@@ -9,14 +9,14 @@ import {
   DialogTitle,
   DialogDescription,
   Dialog,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -24,19 +24,23 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
+} from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import dayjs from "dayjs";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import useAccountTypeList from "@/services/accountType/useAccountTypeList";
 import CurrencyInput from "react-currency-input-field";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Calendar } from "../ui/calendar";
-import { TimePicker } from "../ui/time-picker/time-picker";
-import { toast } from "../ui/use-toast";
+import { Calendar } from "@/components/ui/calendar";
+import { TimePicker } from "@/components/ui/time-picker/time-picker";
+import { toast } from "@/components/ui/use-toast";
 import useLoadingStore from "@/stores/useLoading";
 
 type Props = {
@@ -86,7 +90,7 @@ export default function AccountFormDialog({
     if (account && mode === "edit") {
       form.setValue("accountName", account.account_name);
       form.setValue("accountTypeId", account.account_type_id);
-      form.setValue("balance", account.account_balance);
+      form.setValue("balance", account.account_balance.replace("-", ""));
       form.setValue("createdAt", dayjs(account.account_date).toDate());
     }
   }, [account, form, mode]);
@@ -111,7 +115,9 @@ export default function AccountFormDialog({
         body: JSON.stringify({
           account_name: data.accountName,
           account_type_id: data.accountTypeId,
-          account_balance: data.balance,
+          account_balance: !["1", "2"].includes(data.accountTypeId)
+            ? `-${data.balance}`
+            : data.balance,
           account_date: dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss"),
         }),
       });
@@ -144,7 +150,9 @@ export default function AccountFormDialog({
           account_id: account!.account_id,
           account_name: data.accountName,
           account_type_id: data.accountTypeId,
-          account_balance: data.balance,
+          account_balance: !["1", "2"].includes(data.accountTypeId)
+            ? `-${data.balance}`
+            : data.balance,
           account_date: dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss"),
         }),
       });

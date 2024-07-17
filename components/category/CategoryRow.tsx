@@ -6,14 +6,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { EllipsisVertical } from "lucide-react";
 import numeral from "numeral";
 
 import { Category } from "@/services/category/useCategoryList";
 import { useRouter } from "next/navigation";
-import CategoryDeleteAlert from "./CategoryDeleteAlert";
-import CategoryFormDialog from "./CategoryFormDialog";
+import CategoryDeleteAlert from "@/components/category/dialog/CategoryDeleteAlert";
+import CategoryFormDialog from "@/components/category/dialog/CategoryFormDialog";
 
 type Props = {
   category: Category;

@@ -276,7 +276,7 @@ export default function DebtPaymentFormDialog({
                                     value={account.account_id}
                                     disabled={
                                       account.account_id ===
-                                      form.getValues().debtPaymentToAccountId
+                                      form.watch("debtPaymentToAccountId")
                                     }
                                   >
                                     <span>{account.account_name} : </span>
@@ -335,7 +335,7 @@ export default function DebtPaymentFormDialog({
                                     value={account.account_id}
                                     disabled={
                                       account.account_id ===
-                                      form.getValues().debtPaymentFromAccountId
+                                      form.watch("debtPaymentFromAccountId")
                                     }
                                   >
                                     <span>{account.account_name} : </span>

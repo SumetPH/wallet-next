@@ -1,13 +1,12 @@
-import React, { useRef, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import CategoryFormDialog from "./CategoryFormDialog";
+import React, { useState } from "react";
+import CategoryFormDialog from "@/components/category/dialog/CategoryFormDialog";
 import { Ellipsis } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 
 type Props = {
   onSuccess: () => void;

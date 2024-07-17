@@ -1,18 +1,18 @@
 import React from "react";
 import { Account } from "@/services/account/useAccountList";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { EllipsisVertical } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { amountColor, cn } from "@/lib/utils";
 import numeral from "numeral";
-import AccountDeleteAlert from "./AccountDeleteAlert";
-import AccountFormDialog from "./AccountFormDialog";
+import AccountDeleteAlert from "@/components/account/dialog/AccountDeleteAlert";
+import AccountFormDialog from "@/components/account/dialog/AccountFormDialog";
 
 type Props = {
   account: Account;

@@ -8,10 +8,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "../ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 import { Account } from "@/services/account/useAccountList";
-import { Button } from "../ui/button";
-import { toast } from "../ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
 import numeral from "numeral";
 
 type Props = {
