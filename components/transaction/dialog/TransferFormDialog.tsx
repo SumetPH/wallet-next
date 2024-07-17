@@ -269,7 +269,7 @@ export default function TransferFormDialog({
                                     value={account.account_id}
                                     disabled={
                                       account.account_id ===
-                                      form.getValues().transferToAccountId
+                                      form.watch("transferToAccountId")
                                     }
                                   >
                                     <span>{account.account_name} : </span>
@@ -328,7 +328,7 @@ export default function TransferFormDialog({
                                     value={account.account_id}
                                     disabled={
                                       account.account_id ===
-                                      form.getValues().transferFromAccountId
+                                      form.watch("transferFromAccountId")
                                     }
                                   >
                                     <span>{account.account_name} : </span>

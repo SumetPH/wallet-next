@@ -5,8 +5,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import AccountFormDialog from "./AccountFormDialog";
+} from "@/components/ui/dropdown-menu";
+import AccountFormDialog from "@/components/account/dialog/AccountFormDialog";
 
 type Props = {
   onSuccess: () => void;

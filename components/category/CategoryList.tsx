@@ -1,6 +1,6 @@
 import React from "react";
 import { Category } from "@/services/category/useCategoryList";
-import SkeletonLoading from "../SkeletonLoading";
+import SkeletonLoading from "@/components/SkeletonLoading";
 import CategoryRow from "./CategoryRow";
 
 type Props = {
