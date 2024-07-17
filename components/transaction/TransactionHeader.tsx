@@ -32,7 +32,7 @@ export default function TransactionHeader({ onSuccess }: Props) {
 
   return (
     <>
-      <div className="flex justify-between gap-2 mb-2">
+      <div className="flex justify-between gap-2 mb-2 sticky top-0 bg-background z-50">
         <section className="text-lg font-medium">
           {title ? (
             <span data-testid="title">รายการ : {title}</span>

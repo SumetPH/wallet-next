@@ -10,7 +10,7 @@ import {
 export default function BudgetHeader() {
   return (
     <>
-      <div className="flex justify-between gap-2 mb-2">
+      <div className="flex justify-between gap-2 mb-2 sticky top-0 bg-background z-50">
         <section className="text-lg font-medium">งบประมาณ</section>
         <section>
           <Dropdown>

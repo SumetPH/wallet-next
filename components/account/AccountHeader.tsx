@@ -24,7 +24,7 @@ export default function AccountHeader({ onSuccess }: Props) {
         onSuccess={onSuccess}
       />
 
-      <div className="flex justify-between gap-2 mb-2">
+      <div className="flex justify-between gap-2 mb-2 sticky top-0 bg-background z-50">
         <section className="text-lg font-medium">บัญชี</section>
         <section>
           <DropdownMenu>
