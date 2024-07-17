@@ -1,7 +1,6 @@
 import numeral from "numeral";
 import React from "react";
 import SkeletonLoading from "../SkeletonLoading";
-import TransactionHeader from "./TransactionHeader";
 
 import { type TransactionRes } from "@/services/transaction/useTransactionList";
 import TransactionRow from "./TransactionRow";
@@ -19,8 +18,6 @@ export default function TransactionList({
 }: Props) {
   return (
     <>
-      <TransactionHeader onSuccess={onSuccess} />
-
       <SkeletonLoading
         isLoading={isFetching}
         dataLength={transactionRes.length}

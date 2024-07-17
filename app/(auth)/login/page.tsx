@@ -108,6 +108,7 @@ export default function Login() {
                       <Input
                         type="email"
                         defaultValue={field.value}
+                        disabled={isLoading}
                         onChange={field.onChange}
                       />
                     </FormControl>
@@ -125,6 +126,7 @@ export default function Login() {
                       <Input
                         type="password"
                         defaultValue={field.value}
+                        disabled={isLoading}
                         onChange={field.onChange}
                       />
                     </FormControl>

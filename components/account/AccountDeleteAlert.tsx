@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -15,18 +15,18 @@ import { toast } from "../ui/use-toast";
 import numeral from "numeral";
 
 type Props = {
-  children: ({ openAlert }: { openAlert: () => void }) => React.ReactNode;
+  alert: boolean;
+  setAlert: React.Dispatch<React.SetStateAction<boolean>>;
   account: Account;
   onSuccess: () => void;
 };
 
 export default function AccountDeleteAlert({
-  children,
+  alert,
+  setAlert,
   account,
   onSuccess,
 }: Props) {
-  const [alert, setAlert] = useState(false);
-
   const deleteFn = async () => {
     try {
       await fetch("/api/v1/account-delete", {
@@ -52,8 +52,6 @@ export default function AccountDeleteAlert({
 
   return (
     <>
-      {children({ openAlert: () => setAlert(true) })}
-
       <AlertDialog open={alert}>
         <AlertDialogContent>
           <AlertDialogHeader>
