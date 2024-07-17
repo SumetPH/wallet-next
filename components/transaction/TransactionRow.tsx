@@ -61,7 +61,14 @@ export default function TransactionRow({ transaction, onSuccess }: Props) {
           </DropdownMenu>
 
           <Avatar>
-            <AvatarFallback>
+            <AvatarFallback
+              className={cn({
+                "bg-red-600 text-white":
+                  transaction.transaction_type_id === "1",
+                "bg-green-600 text-white":
+                  transaction.transaction_type_id === "2",
+              })}
+            >
               <span className="text-xs">
                 {transaction.transaction_type_name}
               </span>
@@ -73,7 +80,10 @@ export default function TransactionRow({ transaction, onSuccess }: Props) {
                 {transaction.account_name}
               </section>
               <section className="font-bold">
-                {transaction.transaction_type_name}
+                {transaction.category_id && transaction.category_name}
+                {transaction.transfer_id && transaction.transaction_type_name}
+                {transaction.debt_payment_id &&
+                  transaction.transaction_type_name}
               </section>
             </div>
             <div>

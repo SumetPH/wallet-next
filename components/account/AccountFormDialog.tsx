@@ -1,5 +1,5 @@
 import { Account } from "@/services/account/useAccountList";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -40,7 +40,8 @@ import { toast } from "../ui/use-toast";
 import useLoadingStore from "@/stores/useLoading";
 
 type Props = {
-  children: ({ openDialog }: { openDialog: () => void }) => React.ReactNode;
+  dialog: boolean;
+  setDialog: React.Dispatch<React.SetStateAction<boolean>>;
   account?: Account;
   mode: "create" | "edit";
   onSuccess?: () => void;
@@ -62,12 +63,12 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function AccountFormDialog({
-  children,
+  dialog,
+  setDialog,
   mode,
   account,
   onSuccess,
 }: Props) {
-  const [dialog, setDialog] = useState(false);
   const { setIsLoading } = useLoadingStore();
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -81,16 +82,18 @@ export default function AccountFormDialog({
 
   const accountTypeList = useAccountTypeList({ enable: dialog });
 
-  const openDialog = () => {
-    setDialog(true);
-
+  const openDialog = useCallback(() => {
     if (account && mode === "edit") {
       form.setValue("accountName", account.account_name);
       form.setValue("accountTypeId", account.account_type_id);
       form.setValue("balance", account.account_balance);
       form.setValue("createdAt", dayjs(account.account_date).toDate());
     }
-  };
+  }, [account, form, mode]);
+
+  useEffect(() => {
+    if (dialog) openDialog();
+  }, [dialog, openDialog]);
 
   const submit = (data: FormData) => {
     if (mode === "create") {
@@ -166,7 +169,6 @@ export default function AccountFormDialog({
 
   return (
     <>
-      {children({ openDialog })}
       <Dialog open={dialog} onOpenChange={(value) => setDialog(value)}>
         <DialogContent
           onEscapeKeyDown={(e) => e.preventDefault()}

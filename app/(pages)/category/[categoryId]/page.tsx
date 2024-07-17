@@ -1,5 +1,6 @@
 "use client";
 
+import TransactionHeader from "@/components/transaction/TransactionHeader";
 import TransactionList from "@/components/transaction/TransactionList";
 import useTransactionList from "@/services/transaction/useTransactionList";
 import React from "react";
@@ -14,10 +15,14 @@ export default function CategoryTransaction({
   });
 
   return (
-    <TransactionList
-      transactionRes={transactionList.data ?? []}
-      isFetching={transactionList.isFetching}
-      onSuccess={transactionList.refetch}
-    />
+    <>
+      <TransactionHeader onSuccess={transactionList.refetch} />
+
+      <TransactionList
+        transactionRes={transactionList.data ?? []}
+        isFetching={transactionList.isFetching}
+        onSuccess={transactionList.refetch}
+      />
+    </>
   );
 }

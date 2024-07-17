@@ -1,22 +1,11 @@
 "use client";
 
 import React from "react";
-import AccountHeader from "./AccountHeader";
 import SkeletonLoading from "../SkeletonLoading";
 import { amountColor, cn } from "@/lib/utils";
 import numeral from "numeral";
 import { AccountType } from "@/services/account/useAccountList";
-import { Avatar, AvatarFallback } from "../ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { EllipsisVertical } from "lucide-react";
-import AccountDeleteAlert from "./AccountDeleteAlert";
-import AccountFormDialog from "./AccountFormDialog";
-import { useRouter } from "next/navigation";
+import AccountRow from "./AccountRow";
 
 type Props = {
   accountTypeList: AccountType[];
@@ -29,12 +18,8 @@ export default function AccountList({
   isFetching,
   onSuccess,
 }: Props) {
-  const router = useRouter();
-
   return (
     <>
-      <AccountHeader onSuccess={onSuccess} />
-
       <SkeletonLoading
         isLoading={isFetching}
         dataLength={accountTypeList.length}
@@ -60,76 +45,11 @@ export default function AccountList({
             </div>
 
             {accountType.accounts.map((account) => (
-              <AccountFormDialog
+              <AccountRow
                 key={account.account_id}
                 account={account}
-                mode="edit"
                 onSuccess={onSuccess}
-              >
-                {({ openDialog: openDialogEdit }) => (
-                  <AccountDeleteAlert account={account} onSuccess={onSuccess}>
-                    {({ openAlert: openAlertDelete }) => (
-                      <div
-                        className="p-2 border-b last:border-none flex justify-between items-center cursor-pointer"
-                        onClick={() =>
-                          router.push(
-                            `/account/${account.account_id}?title=${account.account_name}`
-                          )
-                        }
-                      >
-                        <div className="flex gap-3 items-center">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger>
-                              <EllipsisVertical />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openDialogEdit();
-                                }}
-                              >
-                                แก้ไข
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openAlertDelete();
-                                }}
-                              >
-                                ลบ
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-
-                          <Avatar>
-                            <AvatarFallback>
-                              <span className="text-xs">
-                                {account.account_name}
-                              </span>
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="text-sm sm:text-base">
-                            <section data-testid="account-name">
-                              {account.account_name}
-                            </section>
-                            <section
-                              data-testid="account-balance"
-                              className={cn(
-                                "font-medium",
-                                amountColor(account.net_balance)
-                              )}
-                            >
-                              {numeral(account.net_balance).format("0,0.00")}{" "}
-                              บาท
-                            </section>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </AccountDeleteAlert>
-                )}
-              </AccountFormDialog>
+              />
             ))}
           </div>
         ))}
