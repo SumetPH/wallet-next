@@ -176,7 +176,7 @@ export default function TransactionFormDialog({
     try {
       setIsLoading(true);
       const res = await fetch("/api/v1/transaction-update", {
-        method: "PUT",
+        method: "PATCH",
         body: JSON.stringify({
           transaction_id: transaction?.transaction_id,
 

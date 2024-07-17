@@ -164,7 +164,7 @@ export default function TransferFormDialog({
     try {
       setIsLoading(true);
       const res = await fetch("/api/v1/transfer-update", {
-        method: "PUT",
+        method: "PATCH",
         body: JSON.stringify({
           transfer_id: transaction?.transfer_id,
           transfer_amount: data.transferAmount,

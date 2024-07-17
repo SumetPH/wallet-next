@@ -5,7 +5,7 @@ import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
-export async function PUT(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   try {
     const schema = z.object({
       budget_id: z.string().min(1),

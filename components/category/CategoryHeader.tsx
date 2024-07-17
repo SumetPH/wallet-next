@@ -1,47 +1,49 @@
-import React, { useRef } from "react";
-import { MdOutlineMoreHoriz } from "react-icons/md";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from "@nextui-org/react";
-import { CategoryFormModal, CategoryFormModalRef } from "./CategoryFormModal";
+import React, { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import CategoryFormDialog from "./CategoryFormDialog";
+import { Ellipsis } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
-export default function CategoryHeader() {
-  const categoryFormModalRef = useRef<CategoryFormModalRef>(null);
-  const queryClient = useQueryClient();
+type Props = {
+  onSuccess: () => void;
+};
+
+export default function CategoryHeader({ onSuccess }: Props) {
+  const [isShowFormDialog, setIsShowFormDialog] = useState(false);
 
   return (
     <>
+      <CategoryFormDialog
+        dialog={isShowFormDialog}
+        setDialog={setIsShowFormDialog}
+        mode="create"
+        onSuccess={onSuccess}
+      />
+
       <div className="flex justify-between gap-2 mb-2">
         <section className="text-lg font-medium">หมวดหมู่</section>
         <section>
-          <Dropdown>
-            <DropdownTrigger>
-              <button>
-                <MdOutlineMoreHoriz size={24} />
-              </button>
-            </DropdownTrigger>
-            <DropdownMenu>
-              <DropdownItem
-                key="accountAdd"
-                onPress={() => categoryFormModalRef.current?.openModal()}
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Ellipsis />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => {
+                  setIsShowFormDialog(true);
+                }}
               >
                 เพิ่มหมวดหมู่
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </section>
       </div>
-
-      <CategoryFormModal
-        ref={categoryFormModalRef}
-        onUpdated={() =>
-          queryClient.invalidateQueries({ queryKey: ["/category-list"] })
-        }
-      />
     </>
   );
 }

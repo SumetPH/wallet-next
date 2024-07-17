@@ -1,5 +1,4 @@
-import { Account } from "@/services/account/useAccountList";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -29,8 +28,6 @@ import { useForm } from "react-hook-form";
 import dayjs from "dayjs";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import useAccountTypeList from "@/services/accountType/useAccountTypeList";
-import CurrencyInput from "react-currency-input-field";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -38,78 +35,79 @@ import { Calendar } from "../ui/calendar";
 import { TimePicker } from "../ui/time-picker/time-picker";
 import { toast } from "../ui/use-toast";
 import useLoadingStore from "@/stores/useLoading";
+import { Category } from "@/services/category/useCategoryList";
+import useCategoryTypeList from "@/services/categoryType/useCategoryType";
 
 type Props = {
-  children: ({ openDialog }: { openDialog: () => void }) => React.ReactNode;
-  account?: Account;
+  dialog: boolean;
+  setDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  category?: Category;
   mode: "create" | "edit";
   onSuccess?: () => void;
 };
 
 const schema = z.object({
-  accountName: z
-    .string({ required_error: "กรุณากรอกชื่อบัญชี" })
-    .min(1, { message: "กรุณากรอกชื่อบัญชี" }),
-  accountTypeId: z
-    .string({ required_error: "กรุณาเลือกประเภทบัญชี" })
-    .min(1, { message: "กรุณาเลือกประเภทบัญชี" }),
-  balance: z
-    .string({ required_error: "กรุณากรอกจํานวนเงิน" })
-    .min(1, { message: "กรุณากรอกจํานวนเงิน" }),
-  createdAt: z.date({ required_error: "กรุณาเลือกวันที่" }),
+  categoryName: z
+    .string({ required_error: "กรุณากรอกชื่อหมวดหมู่" })
+    .min(1, { message: "กรุณากรอกชื่อหมวดหมู่" }),
+  categoryTypeId: z
+    .string({ required_error: "กรุณาเลือกประเภทหมวดหมู่" })
+    .min(1, { message: "กรุณาเลือกประเภทหมวดหมู่" }),
+  date: z.date({ required_error: "กรุณาเลือกวันที่" }),
 });
 
 type FormData = z.infer<typeof schema>;
 
-export default function AccountFormDialog({
-  children,
+export default function CategoryFormDialog({
+  dialog,
+  setDialog,
   mode,
-  account,
+  category,
   onSuccess,
 }: Props) {
-  const [dialog, setDialog] = useState(false);
   const { setIsLoading } = useLoadingStore();
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      accountName: "",
-      accountTypeId: "",
-      balance: "",
-      createdAt: dayjs().toDate(),
+      categoryName: "",
+      categoryTypeId: "",
+      date: dayjs().toDate(),
     },
   });
 
-  const accountTypeList = useAccountTypeList({ enable: dialog });
+  const categoryTypeList = useCategoryTypeList({ enable: dialog });
 
-  const openDialog = () => {
-    setDialog(true);
-
-    if (account && mode === "edit") {
-      form.setValue("accountName", account.account_name);
-      form.setValue("accountTypeId", account.account_type_id);
-      form.setValue("balance", account.account_balance);
-      form.setValue("createdAt", dayjs(account.account_date).toDate());
+  const openDialog = useCallback(() => {
+    if (category && mode === "edit") {
+      form.setValue("categoryName", category.category_name);
+      form.setValue("categoryTypeId", category.category_type_id);
+      form.setValue("date", dayjs(category.category_date).toDate());
     }
-  };
+  }, [category, form, mode]);
+
+  useEffect(() => {
+    if (dialog) {
+      openDialog();
+    }
+  }, [dialog, openDialog]);
 
   const submit = (data: FormData) => {
     if (mode === "create") {
-      createAccount(data);
+      createCategory(data);
     } else {
-      updateAccount(data);
+      updateCategory(data);
     }
   };
 
-  const createAccount = async (data: FormData) => {
+  const createCategory = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const res = await fetch("/api/v1/account-create", {
+      const res = await fetch("/api/v1/category-create", {
         method: "POST",
         body: JSON.stringify({
-          account_name: data.accountName,
-          account_type_id: data.accountTypeId,
-          account_balance: data.balance,
-          account_date: dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+          category_name: data.categoryName,
+          category_type_id: data.categoryTypeId,
+          category_date: dayjs(data.date).format("YYYY-MM-DD HH:mm:ss"),
         }),
       });
 
@@ -132,17 +130,16 @@ export default function AccountFormDialog({
     }
   };
 
-  const updateAccount = async (data: FormData) => {
+  const updateCategory = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const res = await fetch("/api/v1/account-update", {
+      const res = await fetch("/api/v1/category-update", {
         method: "PATCH",
         body: JSON.stringify({
-          account_id: account!.account_id,
-          account_name: data.accountName,
-          account_type_id: data.accountTypeId,
-          account_balance: data.balance,
-          account_date: dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+          category_id: category!.category_id,
+          category_name: data.categoryName,
+          category_type_id: data.categoryTypeId,
+          category_date: dayjs(data.date).format("YYYY-MM-DD HH:mm:ss"),
         }),
       });
       if (res.status === 200) {
@@ -166,7 +163,6 @@ export default function AccountFormDialog({
 
   return (
     <>
-      {children({ openDialog })}
       <Dialog open={dialog} onOpenChange={(value) => setDialog(value)}>
         <DialogContent
           onEscapeKeyDown={(e) => e.preventDefault()}
@@ -177,23 +173,23 @@ export default function AccountFormDialog({
             <form onSubmit={form.handleSubmit(submit)}>
               <DialogHeader>
                 <DialogTitle className="mb-4" data-testid="dialog-title">
-                  {mode === "create" ? "เพิ่มบัญชี" : "แก้ไขบัญชี"}
+                  {mode === "create" ? "เพิ่มหมวดหมู่" : "แก้ไขหมวดหมู่"}
                 </DialogTitle>
                 <DialogDescription></DialogDescription>
               </DialogHeader>
               <div>
                 <FormField
                   control={form.control}
-                  name="accountName"
+                  name="categoryName"
                   render={({ field }) => (
                     <FormItem className="mb-4">
                       <FormLabel>ชื่อบัญชี</FormLabel>
                       <FormControl>
                         <Input
-                          data-testid="input-account-name"
+                          data-testid="input-category-name"
                           defaultValue={field.value}
                           onChange={field.onChange}
-                          placeholder="ชื่อบัญชี"
+                          placeholder="ชื่อหมวดหมู่"
                         />
                       </FormControl>
                       <FormMessage />
@@ -203,7 +199,7 @@ export default function AccountFormDialog({
 
                 <FormField
                   control={form.control}
-                  name="accountTypeId"
+                  name="categoryTypeId"
                   render={({ field }) => (
                     <FormItem className="mb-4">
                       <FormLabel>ประเภทบัญชี</FormLabel>
@@ -212,27 +208,27 @@ export default function AccountFormDialog({
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger data-testid="select-account-type">
-                            <SelectValue placeholder="เลือกประเภทบัญชี" />
+                          <SelectTrigger data-testid="select-category-type">
+                            <SelectValue placeholder="เลือกประเภทหมวดหมู่" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {accountTypeList.isFetching && (
+                          {categoryTypeList.isFetching && (
                             <SelectItem value="loading" disabled>
                               กำลังโหลด...
                             </SelectItem>
                           )}
-                          {accountTypeList.data?.length === 0 && (
+                          {categoryTypeList.data?.length === 0 && (
                             <SelectItem value="empty" disabled>
                               ไม่พบหมวดหมู่
                             </SelectItem>
                           )}
-                          {accountTypeList.data?.map((accountType) => (
+                          {categoryTypeList.data?.map((categoryType) => (
                             <SelectItem
-                              key={accountType.account_type_id}
-                              value={accountType.account_type_id}
+                              key={categoryType.category_type_id}
+                              value={categoryType.category_type_id}
                             >
-                              {accountType.account_type_name}
+                              {categoryType.category_type_name}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -244,28 +240,7 @@ export default function AccountFormDialog({
 
                 <FormField
                   control={form.control}
-                  name="balance"
-                  render={({ field }) => (
-                    <FormItem className="mb-4">
-                      <FormLabel>ยอดเริ่มต้น</FormLabel>
-                      <FormControl>
-                        <CurrencyInput
-                          data-testid="input-account-balance"
-                          placeholder="จํานวน"
-                          className="input-currency"
-                          defaultValue={field.value}
-                          decimalsLimit={2}
-                          onValueChange={(value) => field.onChange(value)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="createdAt"
+                  name="date"
                   render={({ field }) => (
                     <FormItem className="mb-4 ">
                       <FormLabel className="text-left">วันที่</FormLabel>

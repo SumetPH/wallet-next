@@ -6,7 +6,7 @@ import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-export async function PUT(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   try {
     const session = await getSession();
     if (!session) {
