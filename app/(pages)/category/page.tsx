@@ -35,7 +35,7 @@ export default function CategoryPage() {
 
   return (
     <>
-      <CategoryHeader />
+      <CategoryHeader onSuccess={categoryList.refetch} />
 
       <Tabs
         className="w-full"

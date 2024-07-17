@@ -15,18 +15,18 @@ import { Category } from "@/services/category/useCategoryList";
 import numeral from "numeral";
 
 type Props = {
-  children: ({ openAlert }: { openAlert: () => void }) => React.ReactNode;
+  alert: boolean;
+  setAlert: React.Dispatch<React.SetStateAction<boolean>>;
   category: Category;
   onSuccess: () => void;
 };
 
 export default function CategoryDeleteAlert({
-  children,
+  alert,
+  setAlert,
   category,
   onSuccess,
 }: Props) {
-  const [alert, setAlert] = useState(false);
-
   const deleteFn = async () => {
     try {
       await fetch("/api/v1/category-delete", {
@@ -52,8 +52,6 @@ export default function CategoryDeleteAlert({
 
   return (
     <>
-      {children({ openAlert: () => setAlert(true) })}
-
       <AlertDialog open={alert}>
         <AlertDialogContent>
           <AlertDialogHeader>

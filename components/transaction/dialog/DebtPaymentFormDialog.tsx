@@ -169,7 +169,7 @@ export default function DebtPaymentFormDialog({
     try {
       setIsLoading(true);
       const res = await fetch("/api/v1/debt-payment-update", {
-        method: "PUT",
+        method: "PATCH",
         body: JSON.stringify({
           debt_payment_id: transaction?.debt_payment_id,
           debt_payment_amount: data.debtPaymentAmount,
