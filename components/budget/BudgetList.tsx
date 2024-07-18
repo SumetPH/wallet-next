@@ -43,8 +43,8 @@ export default function BudgetList({
 
       {!isFetching && budgetRes && budgetRes.budgetList.length > 0 && (
         <>
-          <div className="flex justify-between items-center font-medium">
-            <span>รายเดือน</span>
+          <div className="flex justify-between items-center font-medium text-sm lg:text-base mb-1">
+            <span>เดือน {dayjs().format("MM-YYYY")}</span>
             <span>เหลือ {remainingDays} วัน</span>
           </div>
           <div className="text-center font-medium text-lg">

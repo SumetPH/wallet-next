@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
       debt_payment_date: z.string().min(1),
       debt_payment_from_account_id: z.string().min(1),
       debt_payment_to_account_id: z.string().min(1),
+      category_id: z.string().optional(),
     });
 
     const body = await schema.parseAsync(await req.json());
@@ -34,6 +35,7 @@ export async function POST(req: NextRequest) {
           debt_payment_date: body.debt_payment_date,
           debt_payment_from_account_id: body.debt_payment_from_account_id,
           debt_payment_to_account_id: body.debt_payment_to_account_id,
+          category_id: body.category_id,
         })
         .returningAll()
         .executeTakeFirstOrThrow();
@@ -48,6 +50,7 @@ export async function POST(req: NextRequest) {
           transaction_note: body.debt_payment_note,
           transaction_date: body.debt_payment_date,
           account_id: body.debt_payment_from_account_id,
+          category_id: body.category_id,
           debt_payment_id: debtPayment.debt_payment_id,
         })
         .executeTakeFirstOrThrow();
@@ -62,6 +65,7 @@ export async function POST(req: NextRequest) {
           transaction_note: body.debt_payment_note,
           transaction_date: body.debt_payment_date,
           account_id: body.debt_payment_to_account_id,
+          category_id: body.category_id,
           debt_payment_id: debtPayment.debt_payment_id,
         })
         .executeTakeFirstOrThrow();

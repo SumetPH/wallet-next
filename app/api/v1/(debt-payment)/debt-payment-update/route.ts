@@ -20,6 +20,7 @@ export async function PATCH(req: NextRequest) {
       debt_payment_date: z.string().min(1),
       debt_payment_from_account_id: z.string().min(1),
       debt_payment_to_account_id: z.string().min(1),
+      category_id: z.string().optional(),
     });
 
     const body = await schema.parseAsync(await req.json());
@@ -35,6 +36,7 @@ export async function PATCH(req: NextRequest) {
           debt_payment_date: body.debt_payment_date,
           debt_payment_from_account_id: body.debt_payment_from_account_id,
           debt_payment_to_account_id: body.debt_payment_to_account_id,
+          category_id: body.category_id,
         })
         .returningAll()
         .executeTakeFirstOrThrow();
@@ -56,6 +58,7 @@ export async function PATCH(req: NextRequest) {
           transaction_date: body.debt_payment_date,
           debt_payment_id: body.debt_payment_id,
           account_id: body.debt_payment_from_account_id,
+          category_id: body.category_id,
         })
         .executeTakeFirstOrThrow();
 
@@ -70,6 +73,7 @@ export async function PATCH(req: NextRequest) {
           transaction_date: body.debt_payment_date,
           debt_payment_id: body.debt_payment_id,
           account_id: body.debt_payment_to_account_id,
+          category_id: body.category_id,
         })
         .executeTakeFirstOrThrow();
     });

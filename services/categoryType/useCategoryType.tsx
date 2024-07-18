@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 export const CategoryType = {
   expense: "1",
   income: "2",
-  transfer: "3",
 };
 
 type CategoryTypeRes = {

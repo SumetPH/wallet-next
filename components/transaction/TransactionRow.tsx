@@ -79,11 +79,11 @@ export default function TransactionRow({ transaction, onSuccess }: Props) {
               <section className="font-medium mr-1">
                 {transaction.account_name}
               </section>
-              <section className="font-bold">
-                {transaction.category_id && transaction.category_name}
-                {transaction.transfer_id && transaction.transaction_type_name}
-                {transaction.debt_payment_id &&
-                  transaction.transaction_type_name}
+              <section className="font-medium mr-1">
+                {transaction.transaction_type_name}
+              </section>
+              <section className="font-medium">
+                {transaction.category_name}
               </section>
             </div>
             <div>

@@ -207,7 +207,7 @@ export default function BudgetFormDialog({
                   name="budgetName"
                   render={({ field }) => (
                     <FormItem className="mb-4">
-                      <FormLabel>จํานวน</FormLabel>
+                      <FormLabel>ชื่องบประมาณ</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="ชื่องบประมาณ"
