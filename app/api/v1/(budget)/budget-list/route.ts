@@ -85,7 +85,7 @@ export async function GET() {
         "budget.budget_id",
         "budget.budget_name",
         "budget.budget_amount",
-        // fn.sum("transactions.transaction_amount").as("expense"),
+        "budget.budget_date",
         sql<string>`sum(case when transactions.transaction_type_id = '1' then transactions.transaction_amount else 0 end)`.as(
           "expense"
         ),

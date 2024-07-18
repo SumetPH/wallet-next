@@ -98,6 +98,10 @@ export default function TransferFormDialog({
   const openDialog = useCallback(() => {
     setDialog(true);
 
+    if (mode === "create") {
+      form.setValue("transferDate", dayjs().toDate());
+    }
+
     if (transaction && mode === "edit") {
       form.setValue("transferAmount", transaction.transfer_amount ?? "");
       form.setValue("transferNote", transaction.transfer_note ?? "");

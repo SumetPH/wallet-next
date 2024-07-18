@@ -98,6 +98,10 @@ export default function DebtPaymentFormDialog({
   const openDialog = useCallback(() => {
     setDialog(true);
 
+    if (mode === "create") {
+      form.setValue("debtPaymentDate", dayjs().toDate());
+    }
+
     if (transaction && mode === "edit") {
       form.setValue("debtPaymentAmount", transaction.debt_payment_amount ?? "");
       form.setValue("debtPaymentNote", transaction.debt_payment_note ?? "");

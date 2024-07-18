@@ -1,28 +1,46 @@
 import React from "react";
-import { MdOutlineMoreHoriz } from "react-icons/md";
+import { Ellipsis } from "lucide-react";
 import {
-  Dropdown,
-  DropdownTrigger,
   DropdownMenu,
-  DropdownItem,
-} from "@nextui-org/react";
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import BudgetFormDialog from "./dialog/BudgetFormDialog";
 
-export default function BudgetHeader() {
+type Props = {
+  onSuccess?: () => void;
+};
+
+export default function BudgetHeader({ onSuccess }: Props) {
+  const [isOpenDialog, setIsOpenDialog] = React.useState(false);
+
   return (
     <>
+      <BudgetFormDialog
+        dialog={isOpenDialog}
+        setDialog={setIsOpenDialog}
+        mode="create"
+        onSuccess={onSuccess}
+      />
+
       <div className="flex justify-between gap-2 mb-2 sticky top-0 bg-background z-50">
         <section className="text-lg font-medium">งบประมาณ</section>
         <section>
-          <Dropdown>
-            <DropdownTrigger>
-              <button>
-                <MdOutlineMoreHoriz size={24} />
-              </button>
-            </DropdownTrigger>
-            <DropdownMenu>
-              <DropdownItem key="accountAdd">เพิ่มบัญชี</DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Ellipsis />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => {
+                  setIsOpenDialog(true);
+                }}
+              >
+                เพิ่มงบประมาณ
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </section>
       </div>
     </>

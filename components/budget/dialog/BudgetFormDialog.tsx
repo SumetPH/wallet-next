@@ -2,8 +2,7 @@
 
 import CurrencyInput from "react-currency-input-field";
 import dayjs from "dayjs";
-import React, { useCallback, useEffect, useState } from "react";
-import useAccountList from "@/services/account/useAccountList";
+import React, { useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
@@ -14,7 +13,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { TimePicker } from "@/components/ui/time-picker/time-picker";
-import { Transaction } from "@/services/transaction/useTransactionList";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,10 +27,7 @@ import {
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
-  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -47,86 +42,70 @@ import {
 import useCategoryList from "@/services/category/useCategoryList";
 import { toast } from "@/components/ui/use-toast";
 import useLoadingStore from "@/stores/useLoading";
-import { TransactionType } from "@/services/transactionType/useTransactionType";
-import numeral from "numeral";
+import { BudgetList } from "@/services/budget/useBudgetList";
+import { CategoryType } from "@/services/categoryType/useCategoryType";
+import { Input } from "@/components/ui/input";
 
 type Props = {
   dialog: boolean;
   setDialog: React.Dispatch<React.SetStateAction<boolean>>;
   mode: "create" | "edit";
-  transaction?: Transaction;
-  transactionType: string;
-  categoryType: string;
+  budget?: BudgetList;
   onSuccess?: () => void;
 };
 
 const schema = z.object({
-  transactionAmount: z
+  budgetName: z
+    .string({ required_error: "กรุณากรอกชื่องบประมาณ" })
+    .min(1, { message: "กรุณากรอกชื่องบประมาณ" }),
+  budgetAmount: z
     .string({ required_error: "กรุณากรอกจํานวนเงิน" })
     .min(1, { message: "กรุณากรอกจํานวนเงิน" }),
-  accountId: z
-    .string({ required_error: "กรุณาเลือกบัญชี" })
-    .min(1, { message: "กรุณาเลือกบัญชี" }),
+  budgetDate: z.date({ required_error: "กรุณาเลือกวันที่" }),
   categoryId: z
     .string({ required_error: "กรุณาเลือกหมวดหมู่" })
     .min(1, { message: "กรุณาเลือกหมวดหมู่" }),
-  transactionNote: z.string().optional(),
-  transactionDate: z.date({ required_error: "กรุณาเลือกวันที่" }),
 });
 
 type FormData = z.infer<typeof schema>;
 
-export default function TransactionFormDialog({
+export default function BudgetFormDialog({
   dialog,
   setDialog,
   mode,
-  transaction,
-  categoryType,
-  transactionType,
+  budget,
   onSuccess,
 }: Props) {
   const { setIsLoading } = useLoadingStore();
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      transactionAmount: "",
-      accountId: "",
+      budgetName: "",
+      budgetAmount: "",
+      budgetDate: dayjs().toDate(),
       categoryId: "",
-      transactionNote: "",
-      transactionDate: dayjs().toDate(),
     },
-  });
-
-  const accountList = useAccountList({
-    enable: dialog,
   });
 
   const categoryList = useCategoryList({
     enable: dialog,
-    categoryType: categoryType,
+    categoryType: CategoryType.expense,
   });
 
   const openDialog = useCallback(() => {
     setDialog(true);
 
     if (mode === "create") {
-      form.setValue("transactionDate", dayjs().toDate());
+      form.setValue("budgetDate", dayjs().toDate());
     }
 
-    if (transaction && mode === "edit") {
-      form.setValue(
-        "transactionAmount",
-        transaction.transaction_amount.replace("-", "")
-      );
-      form.setValue("accountId", transaction.account_id ?? "");
-      form.setValue("categoryId", transaction.category_id ?? "");
-      form.setValue("transactionNote", transaction.transaction_note ?? "");
-      form.setValue(
-        "transactionDate",
-        dayjs(transaction.transaction_date).toDate()
-      );
+    if (budget && mode === "edit") {
+      form.setValue("budgetName", budget.budget_name ?? "");
+      form.setValue("budgetAmount", budget.budget_amount);
+      form.setValue("categoryId", budget.category_id ?? "");
+      form.setValue("budgetDate", dayjs(budget.budget_date).toDate());
     }
-  }, [form, mode, setDialog, transaction]);
+  }, [form, mode, setDialog, budget]);
 
   useEffect(() => {
     if (dialog) {
@@ -136,28 +115,21 @@ export default function TransactionFormDialog({
 
   const submit = (data: FormData) => {
     if (mode === "create") {
-      createTransaction(data);
+      createBudget(data);
     } else {
-      updateTransaction(data);
+      updateBudget(data);
     }
   };
 
-  const createTransaction = async (data: FormData) => {
+  const createBudget = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const res = await fetch("/api/v1/transaction-create", {
+      const res = await fetch("/api/v1/budget-create", {
         method: "POST",
         body: JSON.stringify({
-          transaction_amount:
-            transactionType === TransactionType.expense
-              ? `-${data.transactionAmount}`
-              : data.transactionAmount,
-          transaction_note: data.transactionNote,
-          transaction_date: dayjs(data.transactionDate).format(
-            "YYYY-MM-DD HH:mm:ss"
-          ),
-          transaction_type_id: transactionType,
-          account_id: data.accountId,
+          budget_name: data.budgetName,
+          budget_amount: data.budgetAmount,
+          budget_date: dayjs(data.budgetDate).format("YYYY-MM-DD HH:mm:ss"),
           category_id: data.categoryId,
         }),
       });
@@ -181,24 +153,16 @@ export default function TransactionFormDialog({
     }
   };
 
-  const updateTransaction = async (data: FormData) => {
+  const updateBudget = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const res = await fetch("/api/v1/transaction-update", {
+      const res = await fetch("/api/v1/budget-update", {
         method: "PATCH",
         body: JSON.stringify({
-          transaction_id: transaction?.transaction_id,
-
-          transaction_amount:
-            transactionType === TransactionType.expense
-              ? `-${data.transactionAmount}`
-              : data.transactionAmount,
-          transaction_note: data.transactionNote,
-          transaction_date: dayjs(data.transactionDate).format(
-            "YYYY-MM-DD HH:mm:ss"
-          ),
-          transaction_type_id: transaction?.transaction_type_id,
-          account_id: data.accountId,
+          budget_id: budget?.budget_id,
+          budget_name: data.budgetName,
+          budget_amount: data.budgetAmount,
+          budget_date: dayjs(data.budgetDate).format("YYYY-MM-DD HH:mm:ss"),
           category_id: data.categoryId,
         }),
       });
@@ -233,18 +197,32 @@ export default function TransactionFormDialog({
             <form onSubmit={form.handleSubmit(submit)}>
               <DialogHeader>
                 <DialogTitle className="mb-4">
-                  {transactionType === TransactionType.expense ? (
-                    <span className="text-red-600">รายจ่าย</span>
-                  ) : (
-                    <span className="text-green-600">รายรับ</span>
-                  )}
+                  <span>งบประมาณ</span>
                 </DialogTitle>
                 <DialogDescription></DialogDescription>
               </DialogHeader>
               <div>
                 <FormField
                   control={form.control}
-                  name="transactionAmount"
+                  name="budgetName"
+                  render={({ field }) => (
+                    <FormItem className="mb-4">
+                      <FormLabel>จํานวน</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="ชื่องบประมาณ"
+                          defaultValue={field.value}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="budgetAmount"
                   render={({ field }) => (
                     <FormItem className="mb-4">
                       <FormLabel>จํานวน</FormLabel>
@@ -260,62 +238,6 @@ export default function TransactionFormDialog({
                           }}
                         />
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="accountId"
-                  render={({ field }) => (
-                    <FormItem className="mb-4">
-                      <FormLabel>บัญชี</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="เลือกบัญชี" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {accountList.isFetching && (
-                            <SelectItem value="loading" disabled>
-                              กำลังโหลด...
-                            </SelectItem>
-                          )}
-                          {accountList.data?.length === 0 && (
-                            <SelectItem value="empty" disabled>
-                              ไม่พบหมวดหมู่
-                            </SelectItem>
-                          )}
-                          {!accountList.isFetching &&
-                            accountList.data?.map((accountType) => (
-                              <SelectGroup key={accountType.account_type_id}>
-                                <SelectLabel>
-                                  {accountType.account_type_name}
-                                </SelectLabel>
-                                {accountType.accounts.map((account) => (
-                                  <SelectItem
-                                    key={account.account_id}
-                                    value={account.account_id}
-                                  >
-                                    <span>{account.account_name} : </span>
-                                    <span>
-                                      {numeral(account.net_balance).format(
-                                        "0,0.00"
-                                      )}{" "}
-                                      บาท
-                                    </span>
-                                  </SelectItem>
-                                ))}
-                                <SelectSeparator />
-                              </SelectGroup>
-                            ))}
-                        </SelectContent>
-                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -365,7 +287,7 @@ export default function TransactionFormDialog({
 
                 <FormField
                   control={form.control}
-                  name="transactionDate"
+                  name="budgetDate"
                   render={({ field }) => (
                     <FormItem className="mb-4">
                       <FormLabel className="text-left">วันที่</FormLabel>

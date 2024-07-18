@@ -33,9 +33,9 @@ export const adapter = new NodePostgresAdapter(
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
     expires: false,
-    attributes: {
-      secure: process.env.NODE_ENV === "production",
-    },
+    // attributes: {
+    //   secure: process.env.NODE_ENV === "production",
+    // },
   },
   getUserAttributes: (attributes) => {
     return {

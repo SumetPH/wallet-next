@@ -55,28 +55,28 @@ export default function Sidebar() {
         <div className="flex flex-col gap-3">
           <Button
             className="justify-start  gap-2 "
-            onClick={() => router.push("/transaction")}
+            onClick={() => router.push("/transaction", { scroll: false })}
           >
             <House size={20} />
             <span className="text-base font-medium">หน้าแรก</span>
           </Button>
           <Button
             className="justify-start gap-2"
-            onClick={() => router.push("/account")}
+            onClick={() => router.push("/account", { scroll: false })}
           >
             <Notebook size={20} />
             <span className="text-base font-medium">บัญชี</span>
           </Button>
           <Button
             className="justify-start gap-2"
-            onClick={() => router.push("/category")}
+            onClick={() => router.push("/category", { scroll: false })}
           >
             <Layers size={20} />
             <span className="text-base font-medium">หมวดหมู่</span>
           </Button>
           <Button
             className="justify-start gap-2"
-            onClick={() => router.push("/budget")}
+            onClick={() => router.push("/budget", { scroll: false })}
           >
             <PieChart size={20} />
             <span className="text-base font-medium">งบประมาณ</span>

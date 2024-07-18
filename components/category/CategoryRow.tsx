@@ -47,7 +47,8 @@ export default function CategoryRow({ category, onSuccess }: Props) {
         className="p-2 border-b last:border-none flex justify-between items-center cursor-pointer"
         onClick={() =>
           router.push(
-            `/category/${category.category_id}?title=${category.category_name}`
+            `/category/${category.category_id}?title=${category.category_name}`,
+            { scroll: false }
           )
         }
       >

@@ -9,7 +9,7 @@ export default function BudgetPage() {
 
   return (
     <>
-      <BudgetHeader />
+      <BudgetHeader onSuccess={budgetList.refetch} />
 
       <BudgetList
         budgetRes={budgetList.data}

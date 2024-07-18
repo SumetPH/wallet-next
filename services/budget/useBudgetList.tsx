@@ -12,6 +12,7 @@ export interface BudgetList {
   budget_id: string;
   budget_name: string;
   budget_amount: string;
+  budget_date: string;
   expense: string;
   remain: string;
   category_id: string;
