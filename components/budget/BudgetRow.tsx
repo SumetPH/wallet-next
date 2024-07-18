@@ -18,10 +18,16 @@ import BudgetDeleteAlert from "./dialog/BudgetDeleteAlert";
 type Props = {
   budget: BudgetList;
   budgetPercent: number;
+  isOnSort?: boolean;
   onSuccess: () => void;
 };
 
-export default function BudgetRow({ budget, budgetPercent, onSuccess }: Props) {
+export default function BudgetRow({
+  budget,
+  budgetPercent,
+  onSuccess,
+  isOnSort,
+}: Props) {
   const router = useRouter();
   const [isOpenDialogForm, setIsOpenDialogForm] = React.useState(false);
   const [isOpenAlertDelete, setIsOpenAlertDelete] = React.useState(false);
@@ -46,6 +52,7 @@ export default function BudgetRow({ budget, budgetPercent, onSuccess }: Props) {
       <div
         className="grid grid-cols-12 gap-2 py-2 border-b last:border-none cursor-pointer"
         onClick={() =>
+          !isOnSort &&
           router.push(
             `/budget/${budget.category_id}?title=${budget.budget_name}`,
             { scroll: false }

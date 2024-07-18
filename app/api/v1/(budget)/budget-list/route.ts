@@ -80,7 +80,7 @@ export async function GET() {
       )
       .where("budget.user_id", "=", session.user.id)
       .groupBy("budget.budget_id")
-      .orderBy("budget.budget_name")
+      .orderBy("budget.budget_order asc")
       .select(({ fn }) => [
         "budget.budget_id",
         "budget.budget_name",
@@ -101,6 +101,7 @@ export async function GET() {
           end
           )`.as("remain"),
         "budget.category_id",
+        "budget.budget_order",
       ])
       .execute();
 

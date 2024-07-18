@@ -5,18 +5,26 @@ import { BudgetRes } from "@/services/budget/useBudgetList";
 import { Progress } from "@/components/ui/progress";
 import BudgetRow from "./BudgetRow";
 import SkeletonLoading from "../SkeletonLoading";
+import ReactDragListView from "react-drag-listview";
+import { GripVertical } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
 
 type Props = {
   budgetRes?: BudgetRes;
   isFetching: boolean;
+  isOnSort?: boolean;
   onSuccess: () => void;
 };
 
 export default function BudgetList({
   budgetRes,
   isFetching,
+  isOnSort,
   onSuccess,
 }: Props) {
+  const queryClient = useQueryClient();
+
   const remainingDays = useMemo(() => {
     const lastDateInMonth = dayjs().endOf("month").format("DD");
     const currentDate = dayjs().format("DD");
@@ -76,19 +84,40 @@ export default function BudgetList({
         </>
       )}
 
-      {!isFetching &&
-        budgetRes &&
-        budgetRes.budgetList.map((budget) => (
-          <BudgetRow
-            key={budget.budget_id}
-            budget={budget}
-            budgetPercent={budgetPercent(
-              budget.budget_amount || "0",
-              budget.expense || "0"
-            )}
-            onSuccess={onSuccess}
-          />
-        ))}
+      {!isFetching && budgetRes && (
+        <ReactDragListView
+          nodeSelector={isOnSort ? ".budget-row" : undefined}
+          onDragEnd={(fromIndex, toIndex) => {
+            const list = [...budgetRes.budgetList];
+            const item = list.splice(fromIndex, 1)[0];
+            list.splice(toIndex, 0, item);
+            queryClient.setQueryData(["/budget-list"], {
+              ...budgetRes,
+              budgetList: list,
+            });
+          }}
+        >
+          {budgetRes.budgetList.map((budget) => (
+            <div
+              key={budget.budget_id}
+              className="budget-row flex items-center bg-background border-b last:border-none"
+            >
+              <div className="w-full ">
+                <BudgetRow
+                  budget={budget}
+                  budgetPercent={budgetPercent(
+                    budget.budget_amount || "0",
+                    budget.expense || "0"
+                  )}
+                  onSuccess={onSuccess}
+                  isOnSort={isOnSort}
+                />
+              </div>
+              {isOnSort && <GripVertical className="mx-5 cursor-pointer" />}
+            </div>
+          ))}
+        </ReactDragListView>
+      )}
     </>
   );
 }
