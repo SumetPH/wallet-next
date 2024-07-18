@@ -47,7 +47,7 @@ export default function BudgetList({
             <span>เดือน {dayjs().format("MM-YYYY")}</span>
             <span>เหลือ {remainingDays} วัน</span>
           </div>
-          <div className="text-center font-medium text-lg">
+          <div className="text-center font-medium text-base sm:text-lg">
             {numeral(budgetRes.budget.budget_total).format("0,0.00")} บาท
           </div>
           <div className="my-3">
@@ -60,7 +60,7 @@ export default function BudgetList({
             />
           </div>
 
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-4 text-sm sm:text-base">
             <section className="text-red-600">
               {numeral(budgetRes.budget.budget_spend).format("0,0.00")} บาท (
               {budgetPercent(
