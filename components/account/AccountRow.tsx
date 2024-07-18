@@ -45,7 +45,8 @@ export default function AccountRow({ account, onSuccess }: Props) {
         className="p-2 border-b last:border-none flex justify-between items-center cursor-pointer"
         onClick={() =>
           router.push(
-            `/account/${account.account_id}?title=${account.account_name}`
+            `/account/${account.account_id}?title=${account.account_name}`,
+            { scroll: false }
           )
         }
       >

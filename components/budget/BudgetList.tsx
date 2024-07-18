@@ -9,7 +9,7 @@ import SkeletonLoading from "../SkeletonLoading";
 type Props = {
   budgetRes?: BudgetRes;
   isFetching: boolean;
-  onSuccess?: () => void;
+  onSuccess: () => void;
 };
 
 export default function BudgetList({
@@ -86,6 +86,7 @@ export default function BudgetList({
               budget.budget_amount || "0",
               budget.expense || "0"
             )}
+            onSuccess={onSuccess}
           />
         ))}
     </>

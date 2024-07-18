@@ -50,25 +50,25 @@ export default function BottomBar() {
         <div className="grid grid-cols-5 h-10">
           <button
             className="flex justify-center items-center"
-            onClick={() => router.push("/transaction")}
+            onClick={() => router.push("/transaction", { scroll: false })}
           >
             <House className={cn(activeMenu("/transaction"))} size={20} />
           </button>
           <button
             className="flex justify-center items-center"
-            onClick={() => router.push("/account")}
+            onClick={() => router.push("/account", { scroll: false })}
           >
             <Notebook className={cn(activeMenu("/account"))} size={20} />
           </button>
           <button
             className="flex justify-center items-center"
-            onClick={() => router.push("/category")}
+            onClick={() => router.push("/category", { scroll: false })}
           >
             <Layers className={cn(activeMenu("/category"))} size={20} />
           </button>
           <button
             className="flex justify-center items-center"
-            onClick={() => router.push("/budget")}
+            onClick={() => router.push("/budget", { scroll: false })}
           >
             <PieChart className={cn(activeMenu("/budget"))} size={20} />
           </button>
