@@ -47,6 +47,8 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import useLoadingStore from "@/stores/useLoading";
 import numeral from "numeral";
+import useCategoryList from "@/services/category/useCategoryList";
+import { CategoryType } from "@/services/categoryType/useCategoryType";
 
 type Props = {
   dialog: boolean;
@@ -68,6 +70,7 @@ const schema = z.object({
   debtPaymentToAccountId: z
     .string({ required_error: "กรุณาเลือกบัญชีปลายทาง" })
     .min(1, { message: "กรุณาเลือกบัญชีปลายทาง" }),
+  categoryId: z.string().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -95,6 +98,11 @@ export default function DebtPaymentFormDialog({
     enable: dialog,
   });
 
+  const categoryList = useCategoryList({
+    enable: dialog,
+    categoryType: CategoryType.expense,
+  });
+
   const openDialog = useCallback(() => {
     setDialog(true);
 
@@ -117,6 +125,7 @@ export default function DebtPaymentFormDialog({
         "debtPaymentToAccountId",
         transaction.debt_payment_to_account_id ?? ""
       );
+      form.setValue("categoryId", transaction.category_id ?? undefined);
     }
   }, [form, mode, setDialog, transaction]);
 
@@ -147,6 +156,7 @@ export default function DebtPaymentFormDialog({
           ),
           debt_payment_from_account_id: data.debtPaymentFromAccountId,
           debt_payment_to_account_id: data.debtPaymentToAccountId,
+          category_id: data.categoryId,
         }),
       });
 
@@ -183,6 +193,7 @@ export default function DebtPaymentFormDialog({
           ),
           debt_payment_from_account_id: data.debtPaymentFromAccountId,
           debt_payment_to_account_id: data.debtPaymentToAccountId,
+          category_id: data.categoryId,
         }),
       });
       if (res.status === 200) {
@@ -353,6 +364,48 @@ export default function DebtPaymentFormDialog({
                                 ))}
                                 <SelectSeparator />
                               </SelectGroup>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="categoryId"
+                  render={({ field }) => (
+                    <FormItem className="mb-4">
+                      <FormLabel>หมวดหมู่</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="เลือกหมวดหมู่" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {categoryList.isFetching && (
+                            <SelectItem value="loading" disabled>
+                              กำลังโหลด...
+                            </SelectItem>
+                          )}
+                          {categoryList.data?.length === 0 && (
+                            <SelectItem value="empty" disabled>
+                              ไม่พบหมวดหมู่
+                            </SelectItem>
+                          )}
+                          {!categoryList.isFetching &&
+                            categoryList.data?.map((category) => (
+                              <SelectItem
+                                key={category.category_id}
+                                value={category.category_id}
+                              >
+                                <span>{category.category_name}</span>
+                              </SelectItem>
                             ))}
                         </SelectContent>
                       </Select>

@@ -27,7 +27,7 @@ export async function GET() {
       .with("budget_spend", (db) =>
         db
           .selectFrom("transactions")
-          .where("transactions.transaction_type_id", "=", "1")
+          .where("transactions.transaction_type_id", "in", ["1", "5"])
           .where("transactions.user_id", "=", session.user.id)
           .where(
             "transaction_date",
@@ -79,6 +79,7 @@ export async function GET() {
           )
       )
       .where("budget.user_id", "=", session.user.id)
+      .where("transactions.transaction_type_id", "in", ["1", "5"])
       .groupBy("budget.budget_id")
       .orderBy("budget.budget_name")
       .select(({ fn }) => [
@@ -86,10 +87,8 @@ export async function GET() {
         "budget.budget_name",
         "budget.budget_amount",
         "budget.budget_date",
-        sql<string>`sum(case when transactions.transaction_type_id = '1' then transactions.transaction_amount else 0 end)`.as(
-          "expense"
-        ),
-        sql<string>`budget.budget_amount + sum(case when transactions.transaction_type_id = '1' then transactions.transaction_amount else 0 end)`.as(
+        sql<string>`sum(transactions.transaction_amount)`.as("expense"),
+        sql<string>`budget.budget_amount + sum(transactions.transaction_amount)`.as(
           "remain"
         ),
         "budget.category_id",
