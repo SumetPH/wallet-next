@@ -1,5 +1,4 @@
 import type { NextRequest } from "next/server";
-import dayjs from "dayjs";
 import db from "@/lib/db";
 import { z } from "zod";
 import { getSession } from "@/lib/auth";

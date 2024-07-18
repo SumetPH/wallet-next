@@ -22,6 +22,13 @@ export async function POST(req: NextRequest) {
 
     const body = await schema.parseAsync(await req.json());
 
+    const budgetList = await db
+      .selectFrom("budget")
+      .where("user_id", "=", session.user.id)
+      .orderBy("budget.budget_order desc")
+      .selectAll()
+      .execute();
+
     const createBudget = await db
       .insertInto("budget")
       .values({
@@ -31,6 +38,8 @@ export async function POST(req: NextRequest) {
         budget_name: body.budget_name,
         budget_date: body.budget_date,
         category_id: body.category_id,
+        budget_order:
+          budgetList.length > 0 ? budgetList[0].budget_order + 1 : 0,
       })
       .executeTakeFirstOrThrow();
 
