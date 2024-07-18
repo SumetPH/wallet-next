@@ -44,7 +44,7 @@ export default function BudgetRow({ budget, budgetPercent, onSuccess }: Props) {
       />
 
       <div
-        className="grid grid-cols-2 gap-2 py-2 border-b last:border-none cursor-pointer"
+        className="grid grid-cols-12 gap-2 py-2 border-b last:border-none cursor-pointer"
         onClick={() =>
           router.push(
             `/budget/${budget.category_id}?title=${budget.budget_name}`,
@@ -52,7 +52,7 @@ export default function BudgetRow({ budget, budgetPercent, onSuccess }: Props) {
           )
         }
       >
-        <div className="col-span-2 sm:col-span-1 flex items-center gap-3">
+        <div className="col-span-6 flex items-center gap-1">
           <DropdownMenu>
             <DropdownMenuTrigger>
               <EllipsisVertical />
@@ -76,23 +76,25 @@ export default function BudgetRow({ budget, budgetPercent, onSuccess }: Props) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Avatar>
+          <Avatar className="hidden sm:flex">
             <AvatarFallback className="text-xs">
               {budget.budget_name}
             </AvatarFallback>
           </Avatar>
-          <div className="font-medium text-sm sm:text-base">
+          <div className="font-medium text-sm sm:text-base sm:mx-2">
             <section>{budget.budget_name}</section>
             <section>
               {numeral(budget.budget_amount).format("0,0.00")} บาท
             </section>
           </div>
         </div>
-        <div className="col-span-2 sm:col-span-1">
-          <section className="text-red-600 text-end">
-            {numeral(budget.expense).format("0,0.00")} บาท (
-            {budgetPercent.toFixed(2)}
-            %)
+        <div className="col-span-6">
+          <section className="text-red-600 text-end text-sm sm:text-base">
+            {numeral(budget.expense).format("0,0.00")} บาท
+            <span className="hidden sm:inline">
+              {" "}
+              ({budgetPercent.toFixed(2)}%)
+            </span>
           </section>
           <section className="my-1">
             <Progress
@@ -103,7 +105,7 @@ export default function BudgetRow({ budget, budgetPercent, onSuccess }: Props) {
           </section>
           <section
             className={cn(
-              "text-end",
+              "text-end text-sm sm:text-base",
               Number(budget.remain) < 0 ? "text-red-600" : "text-green-600"
             )}
           >
