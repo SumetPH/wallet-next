@@ -191,7 +191,7 @@ export default function CategoryFormDialog({
                       <FormControl>
                         <Input
                           data-testid="input-category-name"
-                          defaultValue={field.value}
+                          value={field.value}
                           onChange={field.onChange}
                           placeholder="ชื่อหมวดหมู่"
                         />

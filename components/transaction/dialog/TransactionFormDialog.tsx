@@ -107,7 +107,7 @@ export default function TransactionFormDialog({
   });
 
   useEffect(() => {
-    if (dialog && accountList.data) {
+    if (dialog && accountList.data && categoryList.data) {
       if (mode === "create") {
         form.setValue("transactionDate", dayjs().toDate());
       }
@@ -126,7 +126,7 @@ export default function TransactionFormDialog({
         );
       }
     }
-  }, [accountList.data, dialog, form, mode, transaction]);
+  }, [accountList.data, categoryList.data, dialog, form, mode, transaction]);
 
   const submit = (data: FormData) => {
     if (mode === "create") {
@@ -248,7 +248,7 @@ export default function TransactionFormDialog({
                           className="input-currency"
                           decimalsLimit={2}
                           allowNegativeValue={false}
-                          defaultValue={field.value}
+                          value={field.value}
                           onValueChange={(value) => {
                             field.onChange(value);
                           }}

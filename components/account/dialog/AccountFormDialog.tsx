@@ -203,7 +203,7 @@ export default function AccountFormDialog({
                       <FormControl>
                         <Input
                           data-testid="input-account-name"
-                          defaultValue={field.value}
+                          value={field.value}
                           onChange={field.onChange}
                           placeholder="ชื่อบัญชี"
                         />
@@ -268,7 +268,7 @@ export default function AccountFormDialog({
                           data-testid="input-account-balance"
                           placeholder="จํานวน"
                           className="input-currency"
-                          defaultValue={field.value}
+                          value={field.value}
                           decimalsLimit={2}
                           onValueChange={(value) => field.onChange(value)}
                         />

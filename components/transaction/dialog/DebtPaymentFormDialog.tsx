@@ -239,7 +239,7 @@ export default function DebtPaymentFormDialog({
                           className="input-currency"
                           decimalsLimit={2}
                           allowNegativeValue={false}
-                          defaultValue={field.value}
+                          value={field.value}
                           onValueChange={(value) => {
                             field.onChange(value);
                           }}
