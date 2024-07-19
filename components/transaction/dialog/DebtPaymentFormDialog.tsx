@@ -103,37 +103,34 @@ export default function DebtPaymentFormDialog({
     categoryType: CategoryType.expense,
   });
 
-  const openDialog = useCallback(() => {
-    setDialog(true);
-
-    if (mode === "create") {
-      form.setValue("debtPaymentDate", dayjs().toDate());
-    }
-
-    if (transaction && mode === "edit") {
-      form.setValue("debtPaymentAmount", transaction.debt_payment_amount ?? "");
-      form.setValue("debtPaymentNote", transaction.debt_payment_note ?? "");
-      form.setValue(
-        "debtPaymentDate",
-        dayjs(transaction.debt_payment_date).toDate()
-      );
-      form.setValue(
-        "debtPaymentFromAccountId",
-        transaction.debt_payment_from_account_id ?? ""
-      );
-      form.setValue(
-        "debtPaymentToAccountId",
-        transaction.debt_payment_to_account_id ?? ""
-      );
-      form.setValue("categoryId", transaction.category_id ?? undefined);
-    }
-  }, [form, mode, setDialog, transaction]);
-
   useEffect(() => {
-    if (dialog) {
-      openDialog();
+    if (dialog && accountList.data && categoryList.data) {
+      if (mode === "create") {
+        form.setValue("debtPaymentDate", dayjs().toDate());
+      }
+
+      if (transaction && mode === "edit") {
+        form.setValue(
+          "debtPaymentAmount",
+          transaction.debt_payment_amount ?? ""
+        );
+        form.setValue("debtPaymentNote", transaction.debt_payment_note ?? "");
+        form.setValue(
+          "debtPaymentDate",
+          dayjs(transaction.debt_payment_date).toDate()
+        );
+        form.setValue(
+          "debtPaymentFromAccountId",
+          transaction.debt_payment_from_account_id ?? ""
+        );
+        form.setValue(
+          "debtPaymentToAccountId",
+          transaction.debt_payment_to_account_id ?? ""
+        );
+        form.setValue("categoryId", transaction.category_id ?? undefined);
+      }
     }
-  }, [dialog, openDialog]);
+  }, [accountList.data, categoryList.data, dialog, form, mode, transaction]);
 
   const submit = (data: FormData) => {
     if (mode === "create") {
@@ -260,8 +257,8 @@ export default function DebtPaymentFormDialog({
                     <FormItem className="mb-4">
                       <FormLabel>บัญชีต้นทาง</FormLabel>
                       <Select
+                        value={field.value}
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -269,18 +266,19 @@ export default function DebtPaymentFormDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {accountList.isFetching && (
+                          {!accountList.data && accountList.isFetching && (
                             <SelectItem value="loading" disabled>
                               กำลังโหลด...
                             </SelectItem>
                           )}
-                          {accountList.data?.length === 0 && (
-                            <SelectItem value="empty" disabled>
-                              ไม่พบหมวดหมู่
-                            </SelectItem>
-                          )}
-                          {!accountList.isFetching &&
-                            accountList.data?.map((accountType) => (
+                          {accountList.data &&
+                            accountList.data.length === 0 && (
+                              <SelectItem value="empty" disabled>
+                                ไม่พบหมวดหมู่
+                              </SelectItem>
+                            )}
+                          {accountList.data &&
+                            accountList.data.map((accountType) => (
                               <SelectGroup key={accountType.account_type_id}>
                                 <SelectLabel>
                                   {accountType.account_type_name}
@@ -319,8 +317,8 @@ export default function DebtPaymentFormDialog({
                     <FormItem className="mb-4">
                       <FormLabel>บัญชีปลายทาง</FormLabel>
                       <Select
+                        value={field.value}
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -328,18 +326,19 @@ export default function DebtPaymentFormDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {accountList.isFetching && (
+                          {!accountList.data && accountList.isFetching && (
                             <SelectItem value="loading" disabled>
                               กำลังโหลด...
                             </SelectItem>
                           )}
-                          {accountList.data?.length === 0 && (
-                            <SelectItem value="empty" disabled>
-                              ไม่พบหมวดหมู่
-                            </SelectItem>
-                          )}
-                          {!accountList.isFetching &&
-                            accountList.data?.map((accountType) => (
+                          {accountList.data &&
+                            accountList.data.length === 0 && (
+                              <SelectItem value="empty" disabled>
+                                ไม่พบหมวดหมู่
+                              </SelectItem>
+                            )}
+                          {accountList.data &&
+                            accountList.data.map((accountType) => (
                               <SelectGroup key={accountType.account_type_id}>
                                 <SelectLabel>
                                   {accountType.account_type_name}
@@ -379,8 +378,8 @@ export default function DebtPaymentFormDialog({
                     <FormItem className="mb-4">
                       <FormLabel>หมวดหมู่</FormLabel>
                       <Select
+                        value={field.value}
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -388,18 +387,19 @@ export default function DebtPaymentFormDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {categoryList.isFetching && (
+                          {!categoryList.data && categoryList.isFetching && (
                             <SelectItem value="loading" disabled>
                               กำลังโหลด...
                             </SelectItem>
                           )}
-                          {categoryList.data?.length === 0 && (
-                            <SelectItem value="empty" disabled>
-                              ไม่พบหมวดหมู่
-                            </SelectItem>
-                          )}
-                          {!categoryList.isFetching &&
-                            categoryList.data?.map((category) => (
+                          {categoryList.data &&
+                            categoryList.data.length === 0 && (
+                              <SelectItem value="empty" disabled>
+                                ไม่พบหมวดหมู่
+                              </SelectItem>
+                            )}
+                          {categoryList.data &&
+                            categoryList.data.map((category) => (
                               <SelectItem
                                 key={category.category_id}
                                 value={category.category_id}

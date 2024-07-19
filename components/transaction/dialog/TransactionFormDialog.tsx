@@ -106,33 +106,27 @@ export default function TransactionFormDialog({
     categoryType: categoryType,
   });
 
-  const openDialog = useCallback(() => {
-    setDialog(true);
-
-    if (mode === "create") {
-      form.setValue("transactionDate", dayjs().toDate());
-    }
-
-    if (transaction && mode === "edit") {
-      form.setValue(
-        "transactionAmount",
-        transaction.transaction_amount.replace("-", "")
-      );
-      form.setValue("accountId", transaction.account_id ?? "");
-      form.setValue("categoryId", transaction.category_id ?? "");
-      form.setValue("transactionNote", transaction.transaction_note ?? "");
-      form.setValue(
-        "transactionDate",
-        dayjs(transaction.transaction_date).toDate()
-      );
-    }
-  }, [form, mode, setDialog, transaction]);
-
   useEffect(() => {
-    if (dialog) {
-      openDialog();
+    if (dialog && accountList.data) {
+      if (mode === "create") {
+        form.setValue("transactionDate", dayjs().toDate());
+      }
+
+      if (transaction && mode === "edit") {
+        form.setValue(
+          "transactionAmount",
+          transaction.transaction_amount.replace("-", "")
+        );
+        form.setValue("accountId", transaction.account_id ?? "");
+        form.setValue("categoryId", transaction.category_id ?? "");
+        form.setValue("transactionNote", transaction.transaction_note ?? "");
+        form.setValue(
+          "transactionDate",
+          dayjs(transaction.transaction_date).toDate()
+        );
+      }
     }
-  }, [dialog, openDialog]);
+  }, [accountList.data, dialog, form, mode, transaction]);
 
   const submit = (data: FormData) => {
     if (mode === "create") {
@@ -272,8 +266,8 @@ export default function TransactionFormDialog({
                     <FormItem className="mb-4">
                       <FormLabel>บัญชี</FormLabel>
                       <Select
+                        value={field.value}
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -281,18 +275,19 @@ export default function TransactionFormDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {accountList.isFetching && (
+                          {!accountList.data && accountList.isFetching && (
                             <SelectItem value="loading" disabled>
                               กำลังโหลด...
                             </SelectItem>
                           )}
-                          {accountList.data?.length === 0 && (
-                            <SelectItem value="empty" disabled>
-                              ไม่พบหมวดหมู่
-                            </SelectItem>
-                          )}
-                          {!accountList.isFetching &&
-                            accountList.data?.map((accountType) => (
+                          {accountList.data &&
+                            accountList.data.length === 0 && (
+                              <SelectItem value="empty" disabled>
+                                ไม่พบหมวดหมู่
+                              </SelectItem>
+                            )}
+                          {accountList.data &&
+                            accountList.data.map((accountType) => (
                               <SelectGroup key={accountType.account_type_id}>
                                 <SelectLabel>
                                   {accountType.account_type_name}
@@ -328,8 +323,8 @@ export default function TransactionFormDialog({
                     <FormItem className="mb-4">
                       <FormLabel>หมวดหมู่</FormLabel>
                       <Select
+                        value={field.value}
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -337,17 +332,18 @@ export default function TransactionFormDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {categoryList.isFetching && (
+                          {!categoryList.data && categoryList.isFetching && (
                             <SelectItem value="loading" disabled>
                               กำลังโหลด...
                             </SelectItem>
                           )}
-                          {categoryList.data?.length === 0 && (
-                            <SelectItem value="empty" disabled>
-                              ไม่พบหมวดหมู่
-                            </SelectItem>
-                          )}
-                          {!categoryList.isFetching &&
+                          {categoryList.data &&
+                            categoryList.data.length === 0 && (
+                              <SelectItem value="empty" disabled>
+                                ไม่พบหมวดหมู่
+                              </SelectItem>
+                            )}
+                          {categoryList.data &&
                             categoryList.data?.map((category) => (
                               <SelectItem
                                 key={category.category_id}

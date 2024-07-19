@@ -61,7 +61,7 @@ const schema = z.object({
   balance: z
     .string({ required_error: "กรุณากรอกจํานวนเงิน" })
     .min(1, { message: "กรุณากรอกจํานวนเงิน" }),
-  createdAt: z.date({ required_error: "กรุณาเลือกวันที่" }),
+  date: z.date({ required_error: "กรุณาเลือกวันที่" }),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -80,24 +80,26 @@ export default function AccountFormDialog({
       accountName: "",
       accountTypeId: "",
       balance: "",
-      createdAt: dayjs().toDate(),
+      date: dayjs().toDate(),
     },
   });
 
   const accountTypeList = useAccountTypeList({ enable: dialog });
 
-  const openDialog = useCallback(() => {
-    if (account && mode === "edit") {
-      form.setValue("accountName", account.account_name);
-      form.setValue("accountTypeId", account.account_type_id);
-      form.setValue("balance", account.account_balance.replace("-", ""));
-      form.setValue("createdAt", dayjs(account.account_date).toDate());
-    }
-  }, [account, form, mode]);
-
   useEffect(() => {
-    if (dialog) openDialog();
-  }, [dialog, openDialog]);
+    if (dialog && accountTypeList.data) {
+      if (mode === "create") {
+        form.setValue("date", dayjs().toDate());
+      }
+
+      if (account && mode === "edit") {
+        form.setValue("accountName", account.account_name);
+        form.setValue("accountTypeId", account.account_type_id);
+        form.setValue("balance", account.account_balance.replace("-", ""));
+        form.setValue("date", dayjs(account.account_date).toDate());
+      }
+    }
+  }, [account, accountTypeList.data, dialog, form, mode]);
 
   const submit = (data: FormData) => {
     if (mode === "create") {
@@ -118,7 +120,7 @@ export default function AccountFormDialog({
           account_balance: !["1", "2"].includes(data.accountTypeId)
             ? `-${data.balance}`
             : data.balance,
-          account_date: dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+          account_date: dayjs(data.date).format("YYYY-MM-DD HH:mm:ss"),
         }),
       });
 
@@ -153,7 +155,7 @@ export default function AccountFormDialog({
           account_balance: !["1", "2"].includes(data.accountTypeId)
             ? `-${data.balance}`
             : data.balance,
-          account_date: dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+          account_date: dayjs(data.date).format("YYYY-MM-DD HH:mm:ss"),
         }),
       });
       if (res.status === 200) {
@@ -218,8 +220,8 @@ export default function AccountFormDialog({
                     <FormItem className="mb-4">
                       <FormLabel>ประเภทบัญชี</FormLabel>
                       <Select
+                        value={field.value}
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger data-testid="select-account-type">
@@ -227,24 +229,27 @@ export default function AccountFormDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {accountTypeList.isFetching && (
-                            <SelectItem value="loading" disabled>
-                              กำลังโหลด...
-                            </SelectItem>
-                          )}
-                          {accountTypeList.data?.length === 0 && (
-                            <SelectItem value="empty" disabled>
-                              ไม่พบหมวดหมู่
-                            </SelectItem>
-                          )}
-                          {accountTypeList.data?.map((accountType) => (
-                            <SelectItem
-                              key={accountType.account_type_id}
-                              value={accountType.account_type_id}
-                            >
-                              {accountType.account_type_name}
-                            </SelectItem>
-                          ))}
+                          {!accountTypeList.data &&
+                            accountTypeList.isFetching && (
+                              <SelectItem value="loading" disabled>
+                                กำลังโหลด...
+                              </SelectItem>
+                            )}
+                          {accountTypeList.data &&
+                            accountTypeList.data.length === 0 && (
+                              <SelectItem value="empty" disabled>
+                                ไม่พบหมวดหมู่
+                              </SelectItem>
+                            )}
+                          {accountTypeList.data &&
+                            accountTypeList.data.map((accountType) => (
+                              <SelectItem
+                                key={accountType.account_type_id}
+                                value={accountType.account_type_id}
+                              >
+                                {accountType.account_type_name}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -275,7 +280,7 @@ export default function AccountFormDialog({
 
                 <FormField
                   control={form.control}
-                  name="createdAt"
+                  name="date"
                   render={({ field }) => (
                     <FormItem className="mb-4 ">
                       <FormLabel className="text-left">วันที่</FormLabel>
