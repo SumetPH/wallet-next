@@ -95,33 +95,30 @@ export default function TransferFormDialog({
     enable: dialog,
   });
 
-  const openDialog = useCallback(() => {
-    setDialog(true);
-
-    if (mode === "create") {
-      form.setValue("transferDate", dayjs().toDate());
-    }
-
-    if (transaction && mode === "edit") {
-      form.setValue("transferAmount", transaction.transfer_amount ?? "");
-      form.setValue("transferNote", transaction.transfer_note ?? "");
-      form.setValue("transferDate", dayjs(transaction.transfer_date).toDate());
-      form.setValue(
-        "transferFromAccountId",
-        transaction.transfer_from_account_id ?? ""
-      );
-      form.setValue(
-        "transferToAccountId",
-        transaction.transfer_to_account_id ?? ""
-      );
-    }
-  }, [form, mode, setDialog, transaction]);
-
   useEffect(() => {
-    if (dialog) {
-      openDialog();
+    if (dialog && accountList.data) {
+      if (mode === "create") {
+        form.setValue("transferDate", dayjs().toDate());
+      }
+
+      if (transaction && mode === "edit") {
+        form.setValue("transferAmount", transaction.transfer_amount ?? "");
+        form.setValue("transferNote", transaction.transfer_note ?? "");
+        form.setValue(
+          "transferDate",
+          dayjs(transaction.transfer_date).toDate()
+        );
+        form.setValue(
+          "transferFromAccountId",
+          transaction.transfer_from_account_id ?? ""
+        );
+        form.setValue(
+          "transferToAccountId",
+          transaction.transfer_to_account_id ?? ""
+        );
+      }
     }
-  }, [dialog, openDialog]);
+  }, [accountList.data, dialog, form, mode, transaction]);
 
   const submit = (data: FormData) => {
     if (mode === "create") {
@@ -242,8 +239,8 @@ export default function TransferFormDialog({
                     <FormItem className="mb-4">
                       <FormLabel>บัญชีต้นทาง</FormLabel>
                       <Select
+                        value={field.value}
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -251,18 +248,19 @@ export default function TransferFormDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {accountList.isFetching && (
+                          {!accountList.data && accountList.isFetching && (
                             <SelectItem value="loading" disabled>
                               กำลังโหลด...
                             </SelectItem>
                           )}
-                          {accountList.data?.length === 0 && (
-                            <SelectItem value="empty" disabled>
-                              ไม่พบหมวดหมู่
-                            </SelectItem>
-                          )}
-                          {!accountList.isFetching &&
-                            accountList.data?.map((accountType) => (
+                          {accountList.data &&
+                            accountList.data.length === 0 && (
+                              <SelectItem value="empty" disabled>
+                                ไม่พบหมวดหมู่
+                              </SelectItem>
+                            )}
+                          {accountList.data &&
+                            accountList.data.map((accountType) => (
                               <SelectGroup key={accountType.account_type_id}>
                                 <SelectLabel>
                                   {accountType.account_type_name}
@@ -302,7 +300,7 @@ export default function TransferFormDialog({
                       <FormLabel>บัญชีปลายทาง</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -310,18 +308,19 @@ export default function TransferFormDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {accountList.isFetching && (
+                          {!accountList.data && accountList.isFetching && (
                             <SelectItem value="loading" disabled>
                               กำลังโหลด...
                             </SelectItem>
                           )}
-                          {accountList.data?.length === 0 && (
-                            <SelectItem value="empty" disabled>
-                              ไม่พบหมวดหมู่
-                            </SelectItem>
-                          )}
-                          {!accountList.isFetching &&
-                            accountList.data?.map((accountType) => (
+                          {accountList.data &&
+                            accountList.data.length === 0 && (
+                              <SelectItem value="empty" disabled>
+                                ไม่พบหมวดหมู่
+                              </SelectItem>
+                            )}
+                          {accountList.data &&
+                            accountList.data.map((accountType) => (
                               <SelectGroup key={accountType.account_type_id}>
                                 <SelectLabel>
                                   {accountType.account_type_name}

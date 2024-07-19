@@ -81,19 +81,19 @@ export default function CategoryFormDialog({
 
   const categoryTypeList = useCategoryTypeList({ enable: dialog });
 
-  const openDialog = useCallback(() => {
-    if (category && mode === "edit") {
-      form.setValue("categoryName", category.category_name);
-      form.setValue("categoryTypeId", category.category_type_id);
-      form.setValue("date", dayjs(category.category_date).toDate());
-    }
-  }, [category, form, mode]);
-
   useEffect(() => {
-    if (dialog) {
-      openDialog();
+    if (dialog && categoryTypeList.data) {
+      if (mode === "create") {
+        form.setValue("date", dayjs().toDate());
+      }
+
+      if (category && mode === "edit") {
+        form.setValue("categoryName", category.category_name);
+        form.setValue("categoryTypeId", category.category_type_id);
+        form.setValue("date", dayjs(category.category_date).toDate());
+      }
     }
-  }, [dialog, openDialog]);
+  }, [category, categoryTypeList.data, dialog, form, mode]);
 
   const submit = (data: FormData) => {
     if (mode === "create") {
@@ -208,8 +208,8 @@ export default function CategoryFormDialog({
                     <FormItem className="mb-4">
                       <FormLabel>ประเภทบัญชี</FormLabel>
                       <Select
+                        value={field.value}
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger data-testid="select-category-type">
@@ -217,24 +217,27 @@ export default function CategoryFormDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {categoryTypeList.isFetching && (
-                            <SelectItem value="loading" disabled>
-                              กำลังโหลด...
-                            </SelectItem>
-                          )}
-                          {categoryTypeList.data?.length === 0 && (
-                            <SelectItem value="empty" disabled>
-                              ไม่พบหมวดหมู่
-                            </SelectItem>
-                          )}
-                          {categoryTypeList.data?.map((categoryType) => (
-                            <SelectItem
-                              key={categoryType.category_type_id}
-                              value={categoryType.category_type_id}
-                            >
-                              {categoryType.category_type_name}
-                            </SelectItem>
-                          ))}
+                          {!categoryTypeList.data &&
+                            categoryTypeList.isFetching && (
+                              <SelectItem value="loading" disabled>
+                                กำลังโหลด...
+                              </SelectItem>
+                            )}
+                          {categoryTypeList.data &&
+                            categoryTypeList.data.length === 0 && (
+                              <SelectItem value="empty" disabled>
+                                ไม่พบหมวดหมู่
+                              </SelectItem>
+                            )}
+                          {categoryTypeList.data &&
+                            categoryTypeList.data.map((categoryType) => (
+                              <SelectItem
+                                key={categoryType.category_type_id}
+                                value={categoryType.category_type_id}
+                              >
+                                {categoryType.category_type_name}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />

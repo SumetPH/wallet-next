@@ -92,26 +92,20 @@ export default function BudgetFormDialog({
     categoryType: CategoryType.expense,
   });
 
-  const openDialog = useCallback(() => {
-    setDialog(true);
-
-    if (mode === "create") {
-      form.setValue("budgetDate", dayjs().toDate());
-    }
-
-    if (budget && mode === "edit") {
-      form.setValue("budgetName", budget.budget_name ?? "");
-      form.setValue("budgetAmount", budget.budget_amount);
-      form.setValue("categoryId", budget.category_id ?? "");
-      form.setValue("budgetDate", dayjs(budget.budget_date).toDate());
-    }
-  }, [form, mode, setDialog, budget]);
-
   useEffect(() => {
-    if (dialog) {
-      openDialog();
+    if (dialog && categoryList.data) {
+      if (mode === "create") {
+        form.setValue("budgetDate", dayjs().toDate());
+      }
+
+      if (budget && mode === "edit") {
+        form.setValue("budgetName", budget.budget_name ?? "");
+        form.setValue("budgetAmount", budget.budget_amount);
+        form.setValue("categoryId", budget.category_id ?? "");
+        form.setValue("budgetDate", dayjs(budget.budget_date).toDate());
+      }
     }
-  }, [dialog, openDialog]);
+  }, [budget, categoryList.data, dialog, form, mode]);
 
   const submit = (data: FormData) => {
     if (mode === "create") {
@@ -250,8 +244,8 @@ export default function BudgetFormDialog({
                     <FormItem className="mb-4">
                       <FormLabel>หมวดหมู่</FormLabel>
                       <Select
+                        value={field.value}
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -259,18 +253,19 @@ export default function BudgetFormDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {categoryList.isFetching && (
+                          {!categoryList.data && categoryList.isFetching && (
                             <SelectItem value="loading" disabled>
                               กำลังโหลด...
                             </SelectItem>
                           )}
-                          {categoryList.data?.length === 0 && (
-                            <SelectItem value="empty" disabled>
-                              ไม่พบหมวดหมู่
-                            </SelectItem>
-                          )}
-                          {!categoryList.isFetching &&
-                            categoryList.data?.map((category) => (
+                          {categoryList.data &&
+                            categoryList.data.length === 0 && (
+                              <SelectItem value="empty" disabled>
+                                ไม่พบหมวดหมู่
+                              </SelectItem>
+                            )}
+                          {categoryList.data &&
+                            categoryList.data.map((category) => (
                               <SelectItem
                                 key={category.category_id}
                                 value={category.category_id}
