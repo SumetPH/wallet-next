@@ -205,7 +205,7 @@ export default function BudgetFormDialog({
                       <FormControl>
                         <Input
                           placeholder="ชื่องบประมาณ"
-                          defaultValue={field.value}
+                          value={field.value}
                           onChange={field.onChange}
                         />
                       </FormControl>
@@ -226,7 +226,7 @@ export default function BudgetFormDialog({
                           className="input-currency"
                           decimalsLimit={2}
                           allowNegativeValue={false}
-                          defaultValue={field.value}
+                          value={field.value}
                           onValueChange={(value) => {
                             field.onChange(value);
                           }}
