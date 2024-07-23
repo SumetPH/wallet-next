@@ -30,7 +30,7 @@ export default function CategoryPage() {
 
   const changeTab = (value: string) => {
     setTab(value);
-    router.replace(`/category?tab=${value}`);
+    router.replace(`/category?tab=${value}`, { scroll: false });
   };
 
   return (
