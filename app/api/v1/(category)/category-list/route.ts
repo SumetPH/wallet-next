@@ -32,7 +32,6 @@ export async function GET(req: NextRequest) {
         "transactions.category_id",
         "category.category_id"
       )
-      .where("transactions.transaction_type_id", "!=", "6")
       .groupBy("category.category_id")
       .select([
         "category.category_type_id",
@@ -40,9 +39,12 @@ export async function GET(req: NextRequest) {
         "category.category_date",
         "category.category_id",
         "category.category_name",
-        sql<string>`coalesce(sum(transactions.transaction_amount), 0.00)`.as(
-          "total"
-        ),
+        sql<string>`coalesce(sum(
+          case 
+            when transactions.transaction_type_id != '6' then transactions.transaction_amount 
+            else 0
+          end
+        ), 0.00)`.as("total"),
       ])
       .orderBy("category.category_name")
       .execute();
