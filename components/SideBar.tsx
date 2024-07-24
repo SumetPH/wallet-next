@@ -2,9 +2,17 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { House, Notebook, LogOut, PieChart, Layers } from "lucide-react";
+import {
+  Moon,
+  Sun,
+  House,
+  Notebook,
+  LogOut,
+  PieChart,
+  Layers,
+  BarChart,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import jsCookie from "js-cookie";
 import { toast } from "./ui/use-toast";
@@ -80,6 +88,13 @@ export default function Sidebar() {
           >
             <PieChart size={20} />
             <span className="text-base font-medium">งบประมาณ</span>
+          </Button>
+          <Button
+            className="justify-start gap-2"
+            onClick={() => router.push("/report", { scroll: false })}
+          >
+            <BarChart size={20} />
+            <span className="text-base font-medium">รายงาน</span>
           </Button>
         </div>
       </div>

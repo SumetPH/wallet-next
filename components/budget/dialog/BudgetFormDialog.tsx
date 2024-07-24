@@ -43,7 +43,7 @@ import useCategoryList from "@/services/category/useCategoryList";
 import { toast } from "@/components/ui/use-toast";
 import useLoadingStore from "@/stores/useLoading";
 import { BudgetList } from "@/services/budget/useBudgetList";
-import { CategoryType } from "@/services/categoryType/useCategoryType";
+import { CategoryType } from "@/services/categoryType/useCategoryTypeList";
 import { Input } from "@/components/ui/input";
 
 type Props = {
