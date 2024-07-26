@@ -40,7 +40,7 @@ import { TimePicker } from "@/components/ui/time-picker/time-picker";
 import { toast } from "@/components/ui/use-toast";
 import useLoadingStore from "@/stores/useLoading";
 import { Category } from "@/services/category/useCategoryList";
-import useCategoryTypeList from "@/services/categoryType/useCategoryType";
+import useCategoryTypeList from "@/services/categoryType/useCategoryTypeList";
 
 type Props = {
   dialog: boolean;

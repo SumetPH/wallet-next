@@ -48,7 +48,7 @@ import { toast } from "@/components/ui/use-toast";
 import useLoadingStore from "@/stores/useLoading";
 import numeral from "numeral";
 import useCategoryList from "@/services/category/useCategoryList";
-import { CategoryType } from "@/services/categoryType/useCategoryType";
+import { CategoryType } from "@/services/categoryType/useCategoryTypeList";
 
 type Props = {
   dialog: boolean;

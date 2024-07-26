@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import TransactionFormDialog from "./dialog/TransactionFormDialog";
-import { CategoryType } from "@/services/categoryType/useCategoryType";
+import { CategoryType } from "@/services/categoryType/useCategoryTypeList";
 import { Ellipsis } from "lucide-react";
 import {
   DropdownMenu,

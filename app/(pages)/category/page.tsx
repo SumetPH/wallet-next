@@ -4,7 +4,7 @@ import CategoryHeader from "@/components/category/CategoryHeader";
 import CategoryList from "@/components/category/CategoryList";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useCategoryList from "@/services/category/useCategoryList";
-import { CategoryType } from "@/services/categoryType/useCategoryType";
+import { CategoryType } from "@/services/categoryType/useCategoryTypeList";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 

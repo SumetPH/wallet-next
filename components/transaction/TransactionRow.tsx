@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import numeral from "numeral";
 import TransactionFormDialog from "./dialog/TransactionFormDialog";
 import { Transaction } from "@/services/transaction/useTransactionList";
-import { CategoryType } from "@/services/categoryType/useCategoryType";
+import { CategoryType } from "@/services/categoryType/useCategoryTypeList";
 import {
   DropdownMenu,
   DropdownMenuContent,
